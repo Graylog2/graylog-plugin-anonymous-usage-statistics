@@ -133,14 +133,15 @@ public abstract class UsageStatsPeriodical extends Periodical {
     }
 
     protected boolean uploadDataSet(UsageStatsRequest usageStatsRequest) {
-        if (getUrl() == null) {
-            log.error("Error while uploading anonymous usage statistics. "
+        final URL url = getUrl();
+        if (url == null) {
+            log.warn("Error while uploading anonymous usage statistics. "
                     + "Please check the 'usage_statistics_url' setting in your configuration.");
             return false;
         }
 
         final Request request = new Request.Builder()
-                .url(getUrl())
+                .url(url)
                 .headers(usageStatsRequest.headers())
                 .post(RequestBody.create(CONTENT_TYPE, usageStatsRequest.body()))
                 .build();
