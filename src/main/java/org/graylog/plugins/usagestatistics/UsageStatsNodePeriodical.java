@@ -31,7 +31,6 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URL;
 
 @Singleton
@@ -39,7 +38,9 @@ public class UsageStatsNodePeriodical extends UsageStatsPeriodical {
     private static final Logger LOG = LoggerFactory.getLogger(UsageStatsNodePeriodical.class);
 
     private final ServerStatus serverStatus;
+    private final NodeId nodeId;
     private final UsageStatsNodeService usageStatsNodeService;
+    private URL url = null;
 
     @Inject
     public UsageStatsNodePeriodical(UsageStatsNodeService usageStatsNodeService,
@@ -69,18 +70,23 @@ public class UsageStatsNodePeriodical extends UsageStatsPeriodical {
                                      OkHttpClient httpClient,
                                      ObjectMapper objectMapper) {
         super(config, clusterConfigService, evictingQueue, httpClient, objectMapper,
-                buildUrl(config.getUrl(), clusterConfigService.get(ClusterId.class), nodeId),
                 "node-" + nodeId.anonymize() + "-%s.smile");
         this.serverStatus = serverStatus;
+        this.nodeId = nodeId;
         this.usageStatsNodeService = usageStatsNodeService;
     }
 
-    private static URL buildUrl(URI uri, ClusterId clusterId, NodeId nodeId) {
-        try {
-            return uri.resolve("cluster/" + clusterId.clusterId() + "/node/" + nodeId.anonymize()).toURL();
-        } catch (MalformedURLException e) {
-            return null;
+    protected URL getUrl() {
+        if (url == null) {
+            try {
+                ClusterId clusterId = clusterConfigService.getOrDefault(ClusterId.class, ClusterId.create("unknown"));
+                url = config.getUrl().resolve("cluster/" + clusterId.clusterId() + "/node/" + nodeId.anonymize()).toURL();
+            } catch (MalformedURLException e) {
+                LOG.debug("Couldn't build service URL", e);
+            }
         }
+
+        return url;
     }
 
     @Override
@@ -95,9 +101,7 @@ public class UsageStatsNodePeriodical extends UsageStatsPeriodical {
 
     @Override
     public boolean startOnThisNode() {
-        return config.isEnabled()
-                && url != null
-                && !serverStatus.hasCapability(ServerStatus.Capability.LOCALMODE);
+        return config.isEnabled() && !serverStatus.hasCapability(ServerStatus.Capability.LOCALMODE);
     }
 
     @Override

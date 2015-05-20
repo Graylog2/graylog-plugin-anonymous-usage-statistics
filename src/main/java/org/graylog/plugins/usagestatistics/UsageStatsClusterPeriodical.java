@@ -30,7 +30,6 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URL;
 
 @Singleton
@@ -39,6 +38,7 @@ public class UsageStatsClusterPeriodical extends UsageStatsPeriodical {
 
     private final ServerStatus serverStatus;
     private final UsageStatsClusterService usageStatsClusterService;
+    private URL url = null;
 
     @Inject
     public UsageStatsClusterPeriodical(UsageStatsClusterService usageStatsClusterService,
@@ -64,19 +64,22 @@ public class UsageStatsClusterPeriodical extends UsageStatsPeriodical {
                                         EvictingQueue<UsageStatsRequest> evictingQueue,
                                         OkHttpClient httpClient,
                                         ObjectMapper objectMapper) {
-        super(config, clusterConfigService, evictingQueue, httpClient, objectMapper,
-                buildUrl(config.getUrl(), clusterConfigService.get(ClusterId.class)),
-                "cluster-%s.smile");
+        super(config, clusterConfigService, evictingQueue, httpClient, objectMapper, "cluster-%s.smile");
         this.serverStatus = serverStatus;
         this.usageStatsClusterService = usageStatsClusterService;
     }
 
-    private static URL buildUrl(URI uri, ClusterId clusterId) {
-        try {
-            return uri.resolve("cluster/" + clusterId.clusterId()).toURL();
-        } catch (MalformedURLException e) {
-            return null;
+    protected URL getUrl() {
+        if (url == null) {
+            try {
+                ClusterId clusterId = clusterConfigService.getOrDefault(ClusterId.class, ClusterId.create("unknown"));
+                url = config.getUrl().resolve("cluster/" + clusterId.clusterId()).toURL();
+            } catch (MalformedURLException e) {
+                LOG.debug("Couldn't build service URL", e);
+            }
         }
+
+        return url;
     }
 
     @Override
@@ -92,7 +95,6 @@ public class UsageStatsClusterPeriodical extends UsageStatsPeriodical {
     @Override
     public boolean startOnThisNode() {
         return config.isEnabled()
-                && url != null
                 && serverStatus.hasCapability(ServerStatus.Capability.MASTER)
                 && !serverStatus.hasCapability(ServerStatus.Capability.LOCALMODE);
     }

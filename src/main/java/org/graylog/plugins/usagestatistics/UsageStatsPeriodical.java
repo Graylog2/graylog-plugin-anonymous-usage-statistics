@@ -52,7 +52,6 @@ public abstract class UsageStatsPeriodical extends Periodical {
     protected final EvictingQueue<UsageStatsRequest> cachedRequestsQueue;
     protected final ObjectMapper objectMapper;
     protected final OkHttpClient httpClient;
-    protected final URL url;
     protected final String filenamePattern;
 
     private final Logger log = getLogger();
@@ -62,18 +61,18 @@ public abstract class UsageStatsPeriodical extends Periodical {
                                    EvictingQueue<UsageStatsRequest> usageStatsRequestsQueue,
                                    OkHttpClient httpClient,
                                    ObjectMapper objectMapper,
-                                   URL url,
                                    String filenamePattern) {
         this.config = checkNotNull(config);
         this.clusterConfigService = checkNotNull(clusterConfigService);
         this.cachedRequestsQueue = checkNotNull(usageStatsRequestsQueue);
         this.httpClient = checkNotNull(httpClient);
         this.objectMapper = checkNotNull(objectMapper);
-        this.url = checkNotNull(url);
         this.filenamePattern = checkNotNull(filenamePattern);
     }
 
     protected abstract byte[] buildPayload();
+
+    protected abstract URL getUrl();
 
     @Override
     public void doRun() {
@@ -134,8 +133,14 @@ public abstract class UsageStatsPeriodical extends Periodical {
     }
 
     protected boolean uploadDataSet(UsageStatsRequest usageStatsRequest) {
+        if (getUrl() == null) {
+            log.error("Error while uploading anonymous usage statistics. "
+                    + "Please check the 'usage_statistics_url' setting in your configuration.");
+            return false;
+        }
+
         final Request request = new Request.Builder()
-                .url(url)
+                .url(getUrl())
                 .headers(usageStatsRequest.headers())
                 .post(RequestBody.create(CONTENT_TYPE, usageStatsRequest.body()))
                 .build();
