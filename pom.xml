@@ -55,7 +55,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <tagNameFormat>@{project.version}</tagNameFormat>
-        <graylog.version>1.1.0-20150520.132933-525</graylog.version>
+        <graylog.version>1.1.0-beta.2</graylog.version>
         <jackson.version>2.5.3</jackson.version>
         <license-maven-plugin.version>2.10</license-maven-plugin.version>
     </properties>
