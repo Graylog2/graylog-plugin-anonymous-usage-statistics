@@ -38,7 +38,6 @@ public class UsageStatsClusterPeriodical extends UsageStatsPeriodical {
 
     private final ServerStatus serverStatus;
     private final UsageStatsClusterService usageStatsClusterService;
-    private URL url = null;
 
     @Inject
     public UsageStatsClusterPeriodical(UsageStatsClusterService usageStatsClusterService,
@@ -70,16 +69,13 @@ public class UsageStatsClusterPeriodical extends UsageStatsPeriodical {
     }
 
     protected URL getUrl() {
-        if (url == null) {
-            try {
-                ClusterId clusterId = clusterConfigService.getOrDefault(ClusterId.class, ClusterId.create("unknown"));
-                url = config.getUrl().resolve("cluster/" + clusterId.clusterId()).toURL();
-            } catch (MalformedURLException e) {
-                LOG.debug("Couldn't build service URL", e);
-            }
+        try {
+            ClusterId clusterId = clusterConfigService.get(ClusterId.class);
+            return clusterId == null ? null : config.getUrl().resolve("cluster/" + clusterId.clusterId()).toURL();
+        } catch (MalformedURLException e) {
+            LOG.debug("Couldn't build service URL", e);
+            return null;
         }
-
-        return url;
     }
 
     @Override
