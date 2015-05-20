@@ -29,12 +29,12 @@
 
     <issueManagement>
         <system>GitHub Issues</system>
-        <url>https://github.com/Graylog2/graylog-plugin-usage-statistics/issues</url>
+        <url>https://github.com/Graylog2/graylog-plugin-anonymous-usage-statistics/issues</url>
     </issueManagement>
 
     <ciManagement>
         <system>Travis CI</system>
-        <url>https://travis-ci.org/Graylog2/graylog-plugin-usage-statistics</url>
+        <url>https://travis-ci.org/Graylog2/graylog-plugin-anonymous-usage-statistics</url>
     </ciManagement>
 
     <licenses>
@@ -46,9 +46,9 @@
     </licenses>
 
     <scm>
-        <developerConnection>scm:git:git@github.com:Graylog2/graylog-plugin-usage-statistics.git</developerConnection>
-        <connection>scm:git:git@github.com:Graylog2/graylog-plugin-usage-statistics</connection>
-        <url>https://github.com/Graylog2/graylog-plugin-usage-statistics</url>
+        <developerConnection>scm:git:git@github.com:Graylog2/graylog-plugin-anonymous-usage-statistics.git</developerConnection>
+        <connection>scm:git:git@github.com:Graylog2/graylog-plugin-anonymous-usage-statistics</connection>
+        <url>https://github.com/Graylog2/graylog-plugin-anonymous-usage-statistics</url>
         <tag>HEAD</tag>
     </scm>
 
