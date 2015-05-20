@@ -77,7 +77,7 @@ public class UsageStatsNodePeriodical extends UsageStatsPeriodical {
 
     protected URL getUrl() {
         try {
-            ClusterId clusterId = clusterConfigService.getOrDefault(ClusterId.class, ClusterId.create("unknown"));
+            ClusterId clusterId = clusterConfigService.get(ClusterId.class);
             return clusterId == null ?
                     null : config.getUrl().resolve("cluster/" + clusterId.clusterId() + "/node/" + nodeId.anonymize()).toURL();
         } catch (MalformedURLException e) {
