@@ -18,6 +18,7 @@ package org.graylog.plugins.usagestatistics;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.EvictingQueue;
+import com.squareup.okhttp.HttpUrl;
 import com.squareup.okhttp.OkHttpClient;
 import org.graylog.plugins.usagestatistics.providers.CompressingHttpClient;
 import org.graylog.plugins.usagestatistics.providers.SmileObjectMapper;
@@ -29,7 +30,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.net.MalformedURLException;
 import java.net.URL;
 
 @Singleton
@@ -69,11 +69,14 @@ public class UsageStatsClusterPeriodical extends UsageStatsPeriodical {
     }
 
     protected URL getUrl() {
-        try {
-            ClusterId clusterId = clusterConfigService.get(ClusterId.class);
-            return clusterId == null ? null : config.getUrl().resolve("cluster/" + clusterId.clusterId()).toURL();
-        } catch (MalformedURLException e) {
-            LOG.debug("Couldn't build service URL", e);
+        final ClusterId clusterId = clusterConfigService.get(ClusterId.class);
+        if (clusterId != null) {
+            return HttpUrl.get(config.getUrl()).newBuilder()
+                    .addPathSegment("cluster")
+                    .addPathSegment(clusterId.clusterId())
+                    .build()
+                    .url();
+        } else {
             return null;
         }
     }
