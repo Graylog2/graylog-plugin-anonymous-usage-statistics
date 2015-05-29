@@ -14,7 +14,7 @@
 
     <groupId>org.graylog.plugins</groupId>
     <artifactId>usage-statistics</artifactId>
-    <version>1.0.3</version>
+    <version>1.0.4-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>Graylog Usage Statistics Plugin</name>
@@ -49,7 +49,7 @@
         <developerConnection>scm:git:git@github.com:Graylog2/graylog-plugin-anonymous-usage-statistics.git</developerConnection>
         <connection>scm:git:git@github.com:Graylog2/graylog-plugin-anonymous-usage-statistics</connection>
         <url>https://github.com/Graylog2/graylog-plugin-anonymous-usage-statistics</url>
-        <tag>1.0.3</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <properties>
