@@ -41,10 +41,16 @@ public class MetricUtils {
             // NOP
         }
     };
-    private static final Gauge<Number> EMPTY_GAUGE = new Gauge<Number>() {
+    private static final Gauge<Integer> EMPTY_INTEGER_GAUGE = new Gauge<Integer>() {
         @Override
-        public Number getValue() {
+        public Integer getValue() {
             return 0;
+        }
+    };
+    private static final Gauge<Double> EMPTY_DOUBLE_GAUGE = new Gauge<Double>() {
+        @Override
+        public Double getValue() {
+            return 0.0D;
         }
     };
     private static final Reservoir EMPTY_RESERVOIR = new UniformReservoir(0) {
@@ -90,8 +96,13 @@ public class MetricUtils {
     }
 
     @SuppressWarnings("unchecked")
-    public static <T extends Number> Gauge<T> safeGetNumericGauge(MetricRegistry registry, String name) {
-        return firstNonNull(registry.getGauges().get(name), EMPTY_GAUGE);
+    public static Gauge<Integer> safeGetIntegerGauge(MetricRegistry registry, String name) {
+        return firstNonNull(registry.getGauges().get(name), EMPTY_INTEGER_GAUGE);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static Gauge<Double> safeGetDoubleGauge(MetricRegistry registry, String name) {
+        return firstNonNull(registry.getGauges().get(name), EMPTY_DOUBLE_GAUGE);
     }
 
     public static Histogram safeGetHistogram(MetricRegistry registry, String name) {

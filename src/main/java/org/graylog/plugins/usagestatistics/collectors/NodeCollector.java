@@ -186,30 +186,30 @@ public class NodeCollector {
         final ThroughputStats throughputStats = ThroughputStats.create(
                 ThroughputStats.Throughput.create(
                         MetricUtils.safeGetCounter(metricRegistry, "org.graylog2.throughput.input").getCount(),
-                        (double) MetricUtils.safeGetNumericGauge(metricRegistry, "org.graylog2.throughput.input.1-sec-rate").getValue()
+                        MetricUtils.safeGetDoubleGauge(metricRegistry, "org.graylog2.throughput.input.1-sec-rate").getValue()
                 ),
                 ThroughputStats.Throughput.create(
                         MetricUtils.safeGetCounter(metricRegistry, "org.graylog2.throughput.output").getCount(),
-                        (double) MetricUtils.safeGetNumericGauge(metricRegistry, "org.graylog2.throughput.output.1-sec-rate").getValue()
+                        MetricUtils.safeGetDoubleGauge(metricRegistry, "org.graylog2.throughput.output.1-sec-rate").getValue()
                 )
         );
         final BufferStats bufferStats = BufferStats.create(
                 BufferStats.Buffer.create(
-                        (long) MetricUtils.safeGetNumericGauge(metricRegistry, "org.graylog2.buffers.input.size").getValue(),
-                        (long) MetricUtils.safeGetNumericGauge(metricRegistry, "org.graylog2.buffers.input.usage").getValue()
+                        (long) MetricUtils.safeGetIntegerGauge(metricRegistry, "org.graylog2.buffers.input.size").getValue(),
+                        (long) MetricUtils.safeGetIntegerGauge(metricRegistry, "org.graylog2.buffers.input.usage").getValue()
                 ), BufferStats.Buffer.create(
-                        (long) MetricUtils.safeGetNumericGauge(metricRegistry, "org.graylog2.buffers.process.size").getValue(),
-                        (long) MetricUtils.safeGetNumericGauge(metricRegistry, "org.graylog2.buffers.process.usage").getValue()
+                        (long) MetricUtils.safeGetIntegerGauge(metricRegistry, "org.graylog2.buffers.process.size").getValue(),
+                        (long) MetricUtils.safeGetIntegerGauge(metricRegistry, "org.graylog2.buffers.process.usage").getValue()
                 ), BufferStats.Buffer.create(
-                        (long) MetricUtils.safeGetNumericGauge(metricRegistry, "org.graylog2.buffers.output.size").getValue(),
-                        (long) MetricUtils.safeGetNumericGauge(metricRegistry, "org.graylog2.buffers.output.usage").getValue()
+                        (long) MetricUtils.safeGetIntegerGauge(metricRegistry, "org.graylog2.buffers.output.size").getValue(),
+                        (long) MetricUtils.safeGetIntegerGauge(metricRegistry, "org.graylog2.buffers.output.usage").getValue()
                 )
         );
         final JournalStats journalStats = JournalStats.create(
-                (long) MetricUtils.safeGetNumericGauge(metricRegistry, "org.graylog2.journal.size").getValue(),
-                (long) MetricUtils.safeGetNumericGauge(metricRegistry, "org.graylog2.journal.size-limit").getValue(),
-                (int) MetricUtils.safeGetNumericGauge(metricRegistry, "org.graylog2.journal.segments").getValue(),
-                (long) MetricUtils.safeGetNumericGauge(metricRegistry, "org.graylog2.journal.entries-uncommitted").getValue(),
+                (long) MetricUtils.safeGetIntegerGauge(metricRegistry, "org.graylog2.journal.size").getValue(),
+                (long) MetricUtils.safeGetIntegerGauge(metricRegistry, "org.graylog2.journal.size-limit").getValue(),
+                (int) MetricUtils.safeGetIntegerGauge(metricRegistry, "org.graylog2.journal.segments").getValue(),
+                (long) MetricUtils.safeGetIntegerGauge(metricRegistry, "org.graylog2.journal.entries-uncommitted").getValue(),
                 MetricUtils.safeGetMeter(metricRegistry, "org.graylog2.shared.journal.KafkaJournal.readMessages").getCount(),
                 MetricUtils.safeGetMeter(metricRegistry, "org.graylog2.shared.journal.KafkaJournal.writtenMessages").getCount()
         );
