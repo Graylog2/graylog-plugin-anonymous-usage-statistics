@@ -46,6 +46,9 @@ public class UsageStatsConfiguration implements PluginConfigBean {
     @Parameter(value = PREFIX + "report_interval", required = true, validator = PositiveDurationValidator.class)
     private Duration reportInterval = Duration.hours(6l);
 
+    @Parameter(value = PREFIX + "initial_delay", required = true, validator = PositiveDurationValidator.class)
+    private Duration initialDelay = Duration.minutes(5l);
+
     @Parameter(value = PREFIX + "gzip_enabled")
     private boolean gzipEnabled = true;
 
@@ -73,6 +76,10 @@ public class UsageStatsConfiguration implements PluginConfigBean {
 
     public Duration getReportInterval() {
         return reportInterval;
+    }
+
+    public Duration getInitialDelay() {
+        return initialDelay;
     }
 
     public boolean isGzipEnabled() {

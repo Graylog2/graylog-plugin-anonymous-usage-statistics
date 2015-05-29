@@ -185,7 +185,7 @@ public abstract class UsageStatsPeriodical extends Periodical {
 
     @Override
     public int getInitialDelaySeconds() {
-        return 300;
+        return Ints.saturatedCast(config.getInitialDelay().toSeconds());
     }
 
     @Override
