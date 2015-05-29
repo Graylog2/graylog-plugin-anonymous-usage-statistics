@@ -47,6 +47,12 @@ public class MetricUtils {
             return 0;
         }
     };
+    private static final Gauge<Long> EMPTY_LONG_GAUGE = new Gauge<Long>() {
+        @Override
+        public Long getValue() {
+            return 0L;
+        }
+    };
     private static final Gauge<Double> EMPTY_DOUBLE_GAUGE = new Gauge<Double>() {
         @Override
         public Double getValue() {
@@ -98,6 +104,11 @@ public class MetricUtils {
     @SuppressWarnings("unchecked")
     public static Gauge<Integer> safeGetIntegerGauge(MetricRegistry registry, String name) {
         return firstNonNull(registry.getGauges().get(name), EMPTY_INTEGER_GAUGE);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static Gauge<Long> safeGetLongGauge(MetricRegistry registry, String name) {
+        return firstNonNull(registry.getGauges().get(name), EMPTY_LONG_GAUGE);
     }
 
     @SuppressWarnings("unchecked")

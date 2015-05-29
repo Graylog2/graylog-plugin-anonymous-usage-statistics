@@ -195,21 +195,21 @@ public class NodeCollector {
         );
         final BufferStats bufferStats = BufferStats.create(
                 BufferStats.Buffer.create(
-                        (long) MetricUtils.safeGetIntegerGauge(metricRegistry, "org.graylog2.buffers.input.size").getValue(),
-                        (long) MetricUtils.safeGetIntegerGauge(metricRegistry, "org.graylog2.buffers.input.usage").getValue()
+                        MetricUtils.safeGetLongGauge(metricRegistry, "org.graylog2.buffers.input.size").getValue(),
+                        MetricUtils.safeGetLongGauge(metricRegistry, "org.graylog2.buffers.input.usage").getValue()
                 ), BufferStats.Buffer.create(
-                        (long) MetricUtils.safeGetIntegerGauge(metricRegistry, "org.graylog2.buffers.process.size").getValue(),
-                        (long) MetricUtils.safeGetIntegerGauge(metricRegistry, "org.graylog2.buffers.process.usage").getValue()
+                        MetricUtils.safeGetLongGauge(metricRegistry, "org.graylog2.buffers.process.size").getValue(),
+                        MetricUtils.safeGetLongGauge(metricRegistry, "org.graylog2.buffers.process.usage").getValue()
                 ), BufferStats.Buffer.create(
-                        (long) MetricUtils.safeGetIntegerGauge(metricRegistry, "org.graylog2.buffers.output.size").getValue(),
-                        (long) MetricUtils.safeGetIntegerGauge(metricRegistry, "org.graylog2.buffers.output.usage").getValue()
+                        MetricUtils.safeGetLongGauge(metricRegistry, "org.graylog2.buffers.output.size").getValue(),
+                        MetricUtils.safeGetLongGauge(metricRegistry, "org.graylog2.buffers.output.usage").getValue()
                 )
         );
         final JournalStats journalStats = JournalStats.create(
-                (long) MetricUtils.safeGetIntegerGauge(metricRegistry, "org.graylog2.journal.size").getValue(),
-                (long) MetricUtils.safeGetIntegerGauge(metricRegistry, "org.graylog2.journal.size-limit").getValue(),
-                (int) MetricUtils.safeGetIntegerGauge(metricRegistry, "org.graylog2.journal.segments").getValue(),
-                (long) MetricUtils.safeGetIntegerGauge(metricRegistry, "org.graylog2.journal.entries-uncommitted").getValue(),
+                MetricUtils.safeGetLongGauge(metricRegistry, "org.graylog2.journal.size").getValue(),
+                MetricUtils.safeGetLongGauge(metricRegistry, "org.graylog2.journal.size-limit").getValue(),
+                MetricUtils.safeGetIntegerGauge(metricRegistry, "org.graylog2.journal.segments").getValue(),
+                MetricUtils.safeGetLongGauge(metricRegistry, "org.graylog2.journal.entries-uncommitted").getValue(),
                 MetricUtils.safeGetMeter(metricRegistry, "org.graylog2.shared.journal.KafkaJournal.readMessages").getCount(),
                 MetricUtils.safeGetMeter(metricRegistry, "org.graylog2.shared.journal.KafkaJournal.writtenMessages").getCount()
         );
