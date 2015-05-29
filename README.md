@@ -10,7 +10,7 @@ The following configuration options can be added to your `graylog.conf`.
 
 | Name                                | Default                                       | Description                                           |
 |-------------------------------------|-----------------------------------------------|-------------------------------------------------------|
-| `usage_statistics_enabled`          | `false`                                       | Enable publishing usage statistics.                   |
+| `usage_statistics_enabled`          | `true`                                        | Enable publishing usage statistics.                   |
 | `usage_statistics_url`              | `https://stats-collector.graylog.com/submit/` | Base URL of the usage statistics service.             |
 | `usage_statistics_cache_timeout`    | `15m`                                         | TTL for usage statistics in local cache.              |
 | `usage_statistics_max_queue_size`   | `10`                                          | Number of usage statistics data sets to store locally |

@@ -32,7 +32,7 @@ public class UsageStatsConfiguration implements PluginConfigBean {
     private static final String PREFIX = "usage_statistics_";
 
     @Parameter(value = PREFIX + "enabled")
-    private boolean enabled = false;
+    private boolean enabled = true;
 
     @Parameter(value = PREFIX + "url", required = true)
     private URI url = URI.create("https://stats-collector.graylog.com/submit/");
