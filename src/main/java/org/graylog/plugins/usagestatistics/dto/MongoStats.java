@@ -19,10 +19,13 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 
+import javax.annotation.Nullable;
+
 @JsonAutoDetect
 @AutoValue
 public abstract class MongoStats {
-    public static MongoStats create(String version, int serverCount, String cpuArch, MongoDatabaseStats databaseStats) {
+    public static MongoStats create(String version, int serverCount, String cpuArch,
+                                    @Nullable MongoDatabaseStats databaseStats) {
         return new AutoValue_MongoStats(version, serverCount, cpuArch, databaseStats);
     }
 
@@ -36,5 +39,6 @@ public abstract class MongoStats {
     public abstract String cpuArch();
 
     @JsonProperty
+    @Nullable
     public abstract MongoDatabaseStats databaseStats();
 }

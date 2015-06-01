@@ -35,24 +35,29 @@ public class MongoCollector {
     public MongoStats getMongoStats() {
         final org.graylog2.system.stats.mongo.MongoStats stats = clusterStatsService.mongoStats();
         final DatabaseStats databaseStats = stats.databaseStats();
-        final MongoDatabaseStats mongoDatabaseStats = MongoDatabaseStats.create(
-                databaseStats.collections(),
-                databaseStats.objects(),
-                databaseStats.avgObjSize(),
-                databaseStats.dataSize(),
-                databaseStats.storageSize(),
-                databaseStats.numExtents(),
-                databaseStats.indexes(),
-                databaseStats.indexSize(),
-                databaseStats.fileSize(),
-                databaseStats.nsSizeMB()
-        );
 
+        final MongoDatabaseStats mongoDatabaseStats;
+        if (databaseStats != null) {
+            mongoDatabaseStats = MongoDatabaseStats.create(
+                    databaseStats.collections(),
+                    databaseStats.objects(),
+                    databaseStats.avgObjSize(),
+                    databaseStats.dataSize(),
+                    databaseStats.storageSize(),
+                    databaseStats.numExtents(),
+                    databaseStats.indexes(),
+                    databaseStats.indexSize(),
+                    databaseStats.fileSize(),
+                    databaseStats.nsSizeMB()
+            );
+        } else {
+            mongoDatabaseStats = null;
+        }
 
         return MongoStats.create(
                 stats.buildInfo().version(),
                 stats.servers().size(),
-                stats.hostInfo().system().cpuArch(),
+                stats.hostInfo() == null ? "unknown" : stats.hostInfo().system().cpuArch(),
                 mongoDatabaseStats
         );
     }
