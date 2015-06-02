@@ -24,7 +24,7 @@ import java.util.EnumSet;
 import java.util.Set;
 
 public class UsageStatsMetaData implements PluginMetaData {
-    public static final Version VERSION = new Version(1, 0, 5);
+    public static final Version VERSION = new Version(1, 0, 6);
 
     @Override
     public String getUniqueId() {
