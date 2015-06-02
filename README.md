@@ -1,5 +1,5 @@
 # Graylog Anonymous Usage Statistics Plugin
-[![Build Status](https://travis-ci.org/Graylog2/anonymous-usage-statistics-plugin.svg?branch=master)](https://travis-ci.org/Graylog2/anonymous-usage-statistics-plugin)
+[![Build Status](https://travis-ci.org/Graylog2/graylog-plugin-anonymous-usage-statistics.svg?branch=master)](https://travis-ci.org/Graylog2/graylog-plugin-anonymous-usage-statistics)
 
 A plugin for collecting anonymous usage statistics of Graylog nodes and clusters.
 
