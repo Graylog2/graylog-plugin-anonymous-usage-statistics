@@ -14,7 +14,7 @@
 
     <groupId>org.graylog.plugins</groupId>
     <artifactId>usage-statistics</artifactId>
-    <version>1.0.6-SNAPSHOT</version>
+    <version>1.0.6</version>
     <packaging>jar</packaging>
 
     <name>Graylog Usage Statistics Plugin</name>
@@ -55,7 +55,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <tagNameFormat>@{project.version}</tagNameFormat>
-        <graylog.version>1.1.0-rc.1</graylog.version>
+        <graylog.version>1.1.0</graylog.version>
         <jackson.version>2.5.3</jackson.version>
         <license-maven-plugin.version>2.10</license-maven-plugin.version>
     </properties>
