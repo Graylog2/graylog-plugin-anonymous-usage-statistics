@@ -3,3 +3,17 @@ language: java
 jdk:
   - oraclejdk7
   - oraclejdk8
+before_deploy:
+  - export RELEASE_PKG_FILE=$(ls target/usage-statistics-*.jar)
+  - echo "Deploying release to GitHub releases"
+deploy:
+  provider: releases
+  api_key:
+    secure: "CmtK8p2qhIkKLUovhxliei+ItAhEp2pCSPSbRBD9tsVnmeoqCDBOVJhqAp+FNDi53IjWJFmo79euo8u0tnxTmrXdWYMsA1ch80l/9zaeZOtgugzzzJKHP3ng4ZbilE7XRD2qRfMdWlUssPHJjfRqmfv8wHFeWwI2nrybOM0NvYyZsDYeXE0uerycDgVLB/FLmZ9vCnwsGUs7SPighgVjsfri22pfbHsCPliX3SoZSDcZH6I1W5xg4Kmbdp6dwD5I4QAWIj1KdHXzmOzQ0gkQ5/4OoeAcReZPoyIdrXienWbCebkLtFoVxkT3/YAxoFDaG1k2b7T2v1VX95wIn5YvFiR2v5kuAnn6DkjPACQKuW7U/W52lUQItTob8vVjruQjOjAMBIxQKPCHPShpzZZZRjzr6DPenoxLS7ZP7Sq9Hzy4qcTUVnpE2nNUBXB/MbIrcp18oV5DPmYXESw4Xst4hOI5+7YF1bt67DFMOfuEet3v4EtBVdB1YNEuZMg2cTM9ktB90GHlz7CN54LjCsq8V/EKy7hR+OiK+sIeJOolJCRnzAAXMRQdaZkUB7fhFqZLgctI+If4haF6WoL6C+eobgaltk3DbTGprtnUuIX8jNbDA2hsjvtVZdrY/EC+/aNYTA0I493iaDLQQR7J1/d7BaW6gnh3YcyGwHnrrKSm8tw="
+  file: 
+    - "${RELEASE_PKG_FILE}"
+  skip_cleanup: true
+  on:
+    tags: true
+    jdk: oraclejdk7
+
