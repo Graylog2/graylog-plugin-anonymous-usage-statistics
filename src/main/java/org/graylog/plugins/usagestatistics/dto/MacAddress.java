@@ -30,6 +30,9 @@ public abstract class MacAddress {
     private static final Pattern PATTERN = Pattern.compile("[0-9a-f]{2}([:-][0-9a-f]{2}){5}", Pattern.CASE_INSENSITIVE);
 
     public static MacAddress create(String macAddress) {
+        if(macAddress == null || macAddress.isEmpty()) {
+            return EMPTY;
+        }
         checkArgument(PATTERN.matcher(macAddress).matches());
 
         return new AutoValue_MacAddress(macAddress.substring(0, 8));
