@@ -69,29 +69,18 @@ public class ElasticsearchCollector {
                 continue;
             }
 
-            final HostInfo.Cpu cpu;
-            final HostInfo.Memory memory;
-            final HostInfo.Memory swap;
-            if (info.getOs() != null) {
-                cpu = HostInfo.Cpu.create(
-                        info.getOs().cpu().model(),
-                        info.getOs().cpu().vendor(),
-                        info.getOs().cpu().mhz(),
-                        info.getOs().cpu().totalCores(),
-                        info.getOs().cpu().totalSockets(),
-                        info.getOs().cpu().coresPerSocket(),
-                        info.getOs().cpu().cacheSize().bytes()
-                );
-                memory = HostInfo.Memory.create(info.getOs().mem().total().bytes());
-                swap = HostInfo.Memory.create(info.getOs().swap().total().bytes());
-
-            } else {
-                cpu = null;
-                memory = null;
-                swap = null;
-            }
-
             final MacAddress macAddress = info.getNetwork() == null ? MacAddress.EMPTY : MacAddress.create(info.getNetwork().primaryInterface().macAddress());
+            final HostInfo.Cpu cpu = info.getOs().cpu() == null ? null : HostInfo.Cpu.create(
+                    info.getOs().cpu().model(),
+                    info.getOs().cpu().vendor(),
+                    info.getOs().cpu().mhz(),
+                    info.getOs().cpu().totalCores(),
+                    info.getOs().cpu().totalSockets(),
+                    info.getOs().cpu().coresPerSocket(),
+                    info.getOs().cpu().cacheSize().bytes()
+            );
+            final HostInfo.Memory memory = info.getOs().mem() == null ? null : HostInfo.Memory.create(info.getOs().mem().total().bytes());
+            final HostInfo.Memory swap = info.getOs().swap() == null ? null : HostInfo.Memory.create(info.getOs().swap().total().bytes());
             final HostInfo hostInfo = HostInfo.create(macAddress, cpu, memory, swap);
 
             final List<String> garbageCollectors;
