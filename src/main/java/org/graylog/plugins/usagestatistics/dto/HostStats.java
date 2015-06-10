@@ -19,10 +19,12 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 
+import javax.annotation.Nullable;
+
 @JsonAutoDetect
 @AutoValue
 public abstract class HostStats {
-    public static HostStats create(double[] loadAvg, Memory memory, Memory swap) {
+    public static HostStats create(double[] loadAvg, @Nullable Memory memory, @Nullable Memory swap) {
         return new AutoValue_HostStats(loadAvg, memory, swap);
     }
 
@@ -30,9 +32,11 @@ public abstract class HostStats {
     public abstract double[] loadAvg();
 
     @JsonProperty
+    @Nullable
     public abstract Memory memory();
 
     @JsonProperty
+    @Nullable
     public abstract Memory swap();
 
     @JsonAutoDetect

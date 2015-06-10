@@ -21,10 +21,12 @@ import com.google.auto.value.AutoValue;
 import org.graylog.plugins.usagestatistics.dto.HostInfo;
 import org.graylog.plugins.usagestatistics.dto.JvmInfo;
 
+import javax.annotation.Nullable;
+
 @JsonAutoDetect
 @AutoValue
 public abstract class ElasticsearchNodeInfo {
-    public static ElasticsearchNodeInfo create(String version, HostInfo hostInfo, JvmInfo jvmInfo) {
+    public static ElasticsearchNodeInfo create(String version, HostInfo hostInfo, @Nullable JvmInfo jvmInfo) {
         return new AutoValue_ElasticsearchNodeInfo(version, hostInfo, jvmInfo);
     }
 
@@ -35,5 +37,6 @@ public abstract class ElasticsearchNodeInfo {
     public abstract HostInfo system();
 
     @JsonProperty
+    @Nullable
     public abstract JvmInfo jvm();
 }

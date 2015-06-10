@@ -19,7 +19,6 @@ import com.codahale.metrics.MetricRegistry;
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.SystemUtils;
-import org.graylog.plugins.usagestatistics.util.MetricUtils;
 import org.graylog.plugins.usagestatistics.UsageStatsMetaData;
 import org.graylog.plugins.usagestatistics.dto.BufferStats;
 import org.graylog.plugins.usagestatistics.dto.Histogram;
@@ -34,6 +33,7 @@ import org.graylog.plugins.usagestatistics.dto.NodeRole;
 import org.graylog.plugins.usagestatistics.dto.NodeStats;
 import org.graylog.plugins.usagestatistics.dto.PluginInfo;
 import org.graylog.plugins.usagestatistics.dto.ThroughputStats;
+import org.graylog.plugins.usagestatistics.util.MetricUtils;
 import org.graylog2.inputs.InputService;
 import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.ServerStatus;
@@ -233,11 +233,11 @@ public class NodeCollector {
 
     private HostStats buildHostStats() {
         final OsStats osStats = statsService.osStats();
-        final HostStats.Memory memory = HostStats.Memory.create(
+        final HostStats.Memory memory = osStats.memory() == null ? null : HostStats.Memory.create(
                 osStats.memory().free(),
                 osStats.memory().used()
         );
-        final HostStats.Memory swap = HostStats.Memory.create(
+        final HostStats.Memory swap = osStats.swap() == null ? null : HostStats.Memory.create(
                 osStats.swap().free(),
                 osStats.swap().used()
         );

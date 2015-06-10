@@ -19,10 +19,15 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 
+import javax.annotation.Nullable;
+
 @JsonAutoDetect
 @AutoValue
 public abstract class HostInfo {
-    public static HostInfo create(MacAddress macAddress, Cpu cpu, Memory memory, Memory swap) {
+    public static HostInfo create(MacAddress macAddress,
+                                  @Nullable Cpu cpu,
+                                  @Nullable Memory memory,
+                                  @Nullable Memory swap) {
         return new AutoValue_HostInfo(macAddress, cpu, memory, swap);
     }
 
@@ -30,12 +35,15 @@ public abstract class HostInfo {
     public abstract MacAddress macAddress();
 
     @JsonProperty
+    @Nullable
     public abstract Cpu cpu();
 
     @JsonProperty
+    @Nullable
     public abstract Memory memory();
 
     @JsonProperty
+    @Nullable
     public abstract Memory swap();
 
     @JsonAutoDetect

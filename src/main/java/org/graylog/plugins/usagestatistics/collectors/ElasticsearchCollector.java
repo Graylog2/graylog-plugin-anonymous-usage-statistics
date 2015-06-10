@@ -69,24 +69,30 @@ public class ElasticsearchCollector {
                 continue;
             }
 
-            final HostInfo.Cpu cpu = HostInfo.Cpu.create(
-                    info.getOs().cpu().model(),
-                    info.getOs().cpu().vendor(),
-                    info.getOs().cpu().mhz(),
-                    info.getOs().cpu().totalCores(),
-                    info.getOs().cpu().totalSockets(),
-                    info.getOs().cpu().coresPerSocket(),
-                    info.getOs().cpu().cacheSize().bytes()
-            );
+            final HostInfo.Cpu cpu;
+            final HostInfo.Memory memory;
+            final HostInfo.Memory swap;
+            if (info.getOs() != null) {
+                cpu = HostInfo.Cpu.create(
+                        info.getOs().cpu().model(),
+                        info.getOs().cpu().vendor(),
+                        info.getOs().cpu().mhz(),
+                        info.getOs().cpu().totalCores(),
+                        info.getOs().cpu().totalSockets(),
+                        info.getOs().cpu().coresPerSocket(),
+                        info.getOs().cpu().cacheSize().bytes()
+                );
+                memory = HostInfo.Memory.create(info.getOs().mem().total().bytes());
+                swap = HostInfo.Memory.create(info.getOs().swap().total().bytes());
 
-            final HostInfo.Memory memory = HostInfo.Memory.create(info.getOs().mem().total().bytes());
-            final HostInfo.Memory swap = HostInfo.Memory.create(info.getOs().swap().total().bytes());
-            final HostInfo hostInfo = HostInfo.create(
-                    MacAddress.create(info.getNetwork().primaryInterface().macAddress()),
-                    cpu,
-                    memory,
-                    swap
-            );
+            } else {
+                cpu = null;
+                memory = null;
+                swap = null;
+            }
+
+            final MacAddress macAddress = info.getNetwork() == null ? MacAddress.EMPTY : MacAddress.create(info.getNetwork().primaryInterface().macAddress());
+            final HostInfo hostInfo = HostInfo.create(macAddress, cpu, memory, swap);
 
             final List<String> garbageCollectors;
             if (stats.getJvm() != null) {
@@ -98,27 +104,33 @@ public class ElasticsearchCollector {
                 garbageCollectors = Collections.emptyList();
             }
 
-            final JvmInfo.Memory jvmMemory = JvmInfo.Memory.create(
-                    info.getJvm().mem().heapInit().bytes(),
-                    info.getJvm().mem().heapMax().bytes(),
-                    info.getJvm().mem().nonHeapInit().bytes(),
-                    info.getJvm().mem().nonHeapMax().bytes(),
-                    info.getJvm().mem().directMemoryMax().bytes()
-            );
-            final JvmInfo.Os jvmOs = JvmInfo.Os.create(
-                    info.getJvm().getSystemProperties().get("os.name"),
-                    info.getJvm().getSystemProperties().get("os.version"),
-                    info.getJvm().getSystemProperties().get("os.arch")
-            );
-            final JvmInfo jvmInfo = JvmInfo.create(
-                    info.getJvm().version(),
-                    info.getJvm().vmName(),
-                    info.getJvm().vmVersion(),
-                    info.getJvm().vmVendor(),
-                    jvmOs,
-                    jvmMemory,
-                    garbageCollectors
-            );
+            final JvmInfo jvmInfo;
+            if (info.getJvm() != null) {
+                final JvmInfo.Memory jvmMemory = JvmInfo.Memory.create(
+                        info.getJvm().mem().heapInit().bytes(),
+                        info.getJvm().mem().heapMax().bytes(),
+                        info.getJvm().mem().nonHeapInit().bytes(),
+                        info.getJvm().mem().nonHeapMax().bytes(),
+                        info.getJvm().mem().directMemoryMax().bytes()
+                );
+                final JvmInfo.Os jvmOs = JvmInfo.Os.create(
+                        info.getJvm().getSystemProperties().get("os.name"),
+                        info.getJvm().getSystemProperties().get("os.version"),
+                        info.getJvm().getSystemProperties().get("os.arch")
+                );
+                jvmInfo = JvmInfo.create(
+                        info.getJvm().version(),
+                        info.getJvm().vmName(),
+                        info.getJvm().vmVersion(),
+                        info.getJvm().vmVendor(),
+                        jvmOs,
+                        jvmMemory,
+                        garbageCollectors
+                );
+            } else {
+                jvmInfo = null;
+            }
+
             final ElasticsearchNodeInfo elasticsearchNodeInfo = ElasticsearchNodeInfo.create(
                     info.getVersion().toString(),
                     hostInfo,
