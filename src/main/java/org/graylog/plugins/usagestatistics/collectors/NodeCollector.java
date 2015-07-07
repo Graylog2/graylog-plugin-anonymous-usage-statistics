@@ -57,6 +57,8 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 
 @Singleton
 public class NodeCollector {
+    private static final long JVM_START = System.nanoTime();
+
     private final NodeId nodeId;
     private final ServerStatus serverStatus;
     private final MetricRegistry metricRegistry;
@@ -182,7 +184,7 @@ public class NodeCollector {
     }
 
     private NodeStats buildNodeStats() {
-        final long uptime = Tools.iso8601().getMillis() - serverStatus.getStartedAt().getMillis();
+        final long uptime = (System.nanoTime() - JVM_START) / 1_000_000L;
         final ThroughputStats throughputStats = ThroughputStats.create(
                 ThroughputStats.Throughput.create(
                         MetricUtils.safeGetCounter(metricRegistry, "org.graylog2.throughput.input").getCount(),
