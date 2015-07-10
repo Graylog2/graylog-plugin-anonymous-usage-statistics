@@ -38,16 +38,16 @@ public class UsageStatsConfiguration implements PluginConfigBean {
     private URI url = URI.create("https://stats-collector.graylog.com/submit/");
 
     @Parameter(value = PREFIX + "cache_timeout", required = true, validator = PositiveDurationValidator.class)
-    private Duration cacheTimeout = Duration.minutes(15l);
+    private Duration cacheTimeout = Duration.minutes(15L);
 
     @Parameter(value = PREFIX + "max_queue_size", required = true, validator = PositiveIntegerValidator.class)
     private int maxQueueSize = 10;
 
     @Parameter(value = PREFIX + "report_interval", required = true, validator = PositiveDurationValidator.class)
-    private Duration reportInterval = Duration.hours(6l);
+    private Duration reportInterval = Duration.hours(6L);
 
     @Parameter(value = PREFIX + "initial_delay", required = true, validator = PositiveDurationValidator.class)
-    private Duration initialDelay = Duration.minutes(5l);
+    private Duration initialDelay = Duration.minutes(5L);
 
     @Parameter(value = PREFIX + "gzip_enabled")
     private boolean gzipEnabled = true;
