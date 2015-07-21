@@ -19,27 +19,25 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 
-import java.util.Set;
-
 @JsonAutoDetect
 @AutoValue
-public abstract class NodeInfo {
-    public static NodeInfo create(NodeRole role,
-                                  String serverVersion,
-                                  Set<PluginInfo> plugins,
-                                  Os os) {
-        return new AutoValue_NodeInfo(role, serverVersion, plugins, os);
+public abstract class Os {
+    public static Os create(String name,
+                            String version,
+                            String arch,
+                            String platformName) {
+        return new AutoValue_Os(name, version, arch, platformName);
     }
 
     @JsonProperty
-    public abstract NodeRole role();
+    public abstract String name();
 
     @JsonProperty
-    public abstract String serverVersion();
+    public abstract String version();
 
     @JsonProperty
-    public abstract Set<PluginInfo> plugins();
+    public abstract String arch();
 
     @JsonProperty
-    public abstract Os os();
+    public abstract String platformName();
 }

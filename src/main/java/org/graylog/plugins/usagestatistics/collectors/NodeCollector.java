@@ -31,13 +31,13 @@ import org.graylog.plugins.usagestatistics.dto.NodeDataSet;
 import org.graylog.plugins.usagestatistics.dto.NodeInfo;
 import org.graylog.plugins.usagestatistics.dto.NodeRole;
 import org.graylog.plugins.usagestatistics.dto.NodeStats;
+import org.graylog.plugins.usagestatistics.dto.Os;
 import org.graylog.plugins.usagestatistics.dto.PluginInfo;
 import org.graylog.plugins.usagestatistics.dto.ThroughputStats;
 import org.graylog.plugins.usagestatistics.util.MetricUtils;
 import org.graylog2.inputs.InputService;
 import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.ServerStatus;
-import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.Version;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.cluster.ClusterId;
@@ -108,8 +108,18 @@ public class NodeCollector {
         return NodeInfo.create(
                 NodeRole.fromCapabilities(serverStatus),
                 Version.CURRENT_CLASSPATH.toString(),
-                buildPluginInfo(plugins)
+                buildPluginInfo(plugins),
+                buildOsInfo()
         );
+    }
+
+    private Os buildOsInfo() {
+        org.jsoftbiz.utils.OS os = org.jsoftbiz.utils.OS.getOs();
+        return Os.create(
+                os.getName(),
+                os.getVersion(),
+                os.getArch(),
+                os.getPlatformName());
     }
 
     private Set<PluginInfo> buildPluginInfo(Set<PluginMetaData> plugins) {
