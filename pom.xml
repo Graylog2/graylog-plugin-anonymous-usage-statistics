@@ -108,6 +108,7 @@
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
             <version>1.10.19</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.squareup.okhttp</groupId>
@@ -136,6 +137,24 @@
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
                             </transformers>
+                            <filters>
+                                <filter>
+                                    <artifact>org.graylog.repackaged:os-platform-finder</artifact>
+                                    <excludes>
+                                        <exclude>org/jsoftbiz/App.class</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
+                            <relocations>
+                                <relocation>
+                                    <pattern>com.fasterxml.jackson</pattern>
+                                    <shadedPattern>org.graylog.plugins.usagestatistics.shaded.jackson</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>org.jsoftbiz.utils.OS</pattern>
+                                    <shadedPattern>org.graylog.plugins.usagestatistics.shaded.OS</shadedPattern>
+                                </relocation>
+                            </relocations>
                         </configuration>
                     </execution>
                 </executions>
