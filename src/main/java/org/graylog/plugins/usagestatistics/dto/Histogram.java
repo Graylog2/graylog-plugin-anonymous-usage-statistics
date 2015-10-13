@@ -15,6 +15,7 @@
  */
 package org.graylog.plugins.usagestatistics.dto;
 
+import com.codahale.metrics.Snapshot;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
@@ -30,34 +31,36 @@ public abstract class Histogram {
     }
 
     public static Histogram fromMetricsTimer(com.codahale.metrics.Timer timer) {
+        final Snapshot snapshot = timer.getSnapshot();
         return create(
                 timer.getCount(),
-                timer.getSnapshot().getMin(),
-                timer.getSnapshot().getMax(),
-                timer.getSnapshot().getMean(),
-                timer.getSnapshot().getMedian(),
-                timer.getSnapshot().get75thPercentile(),
-                timer.getSnapshot().get95thPercentile(),
-                timer.getSnapshot().get98thPercentile(),
-                timer.getSnapshot().get99thPercentile(),
-                timer.getSnapshot().get999thPercentile(),
-                timer.getSnapshot().getStdDev()
+                snapshot.getMin(),
+                snapshot.getMax(),
+                snapshot.getMean(),
+                snapshot.getMedian(),
+                snapshot.get75thPercentile(),
+                snapshot.get95thPercentile(),
+                snapshot.get98thPercentile(),
+                snapshot.get99thPercentile(),
+                snapshot.get999thPercentile(),
+                snapshot.getStdDev()
         );
     }
 
     public static Histogram fromMetricsHistogram(com.codahale.metrics.Histogram histogram) {
+        final Snapshot snapshot = histogram.getSnapshot();
         return create(
                 histogram.getCount(),
-                histogram.getSnapshot().getMin(),
-                histogram.getSnapshot().getMax(),
-                histogram.getSnapshot().getMean(),
-                histogram.getSnapshot().getMedian(),
-                histogram.getSnapshot().get75thPercentile(),
-                histogram.getSnapshot().get95thPercentile(),
-                histogram.getSnapshot().get98thPercentile(),
-                histogram.getSnapshot().get99thPercentile(),
-                histogram.getSnapshot().get999thPercentile(),
-                histogram.getSnapshot().getStdDev()
+                snapshot.getMin(),
+                snapshot.getMax(),
+                snapshot.getMean(),
+                snapshot.getMedian(),
+                snapshot.get75thPercentile(),
+                snapshot.get95thPercentile(),
+                snapshot.get98thPercentile(),
+                snapshot.get99thPercentile(),
+                snapshot.get999thPercentile(),
+                snapshot.getStdDev()
         );
     }
 

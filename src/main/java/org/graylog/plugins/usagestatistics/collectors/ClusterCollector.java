@@ -76,24 +76,26 @@ public class ClusterCollector {
     }
 
     private ClusterStats buildClusterStats() {
+        final org.graylog2.system.stats.ClusterStats clusterStats = clusterStatsService.clusterStats();
+
         return ClusterStats.create(
                 elasticsearchCollector.getClusterStats(),
                 elasticsearchCollector.getNodeInfos(),
                 mongoCollector.getMongoStats(),
                 collectorCollector.getCollectorInfos(),
-                clusterStatsService.clusterStats().streamCount(),
-                clusterStatsService.clusterStats().streamRuleCount(),
-                clusterStatsService.clusterStats().streamRuleCountByStream(),
-                clusterStatsService.clusterStats().userCount(),
-                clusterStatsService.clusterStats().outputCount(),
-                clusterStatsService.clusterStats().outputCountByType(),
-                clusterStatsService.clusterStats().dashboardCount(),
-                clusterStatsService.clusterStats().inputCount(),
-                clusterStatsService.clusterStats().globalInputCount(),
-                clusterStatsService.clusterStats().inputCountByType(),
-                clusterStatsService.clusterStats().extractorCount(),
+                clusterStats.streamCount(),
+                clusterStats.streamRuleCount(),
+                clusterStats.streamRuleCountByStream(),
+                clusterStats.userCount(),
+                clusterStats.outputCount(),
+                clusterStats.outputCountByType(),
+                clusterStats.dashboardCount(),
+                clusterStats.inputCount(),
+                clusterStats.globalInputCount(),
+                clusterStats.inputCountByType(),
+                clusterStats.extractorCount(),
                 buildExtractorCountByType(),
-                clusterStatsService.clusterStats().contentPackCount(),
+                clusterStats.contentPackCount(),
                 counts.total(),
                 buildStreamThroughput()
         );
