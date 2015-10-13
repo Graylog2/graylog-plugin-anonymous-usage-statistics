@@ -19,6 +19,7 @@ import org.graylog.plugins.usagestatistics.dto.MongoDatabaseStats;
 import org.graylog.plugins.usagestatistics.dto.MongoStats;
 import org.graylog2.system.stats.ClusterStatsService;
 import org.graylog2.system.stats.mongo.DatabaseStats;
+import org.graylog2.system.stats.mongo.HostInfo;
 
 import javax.inject.Inject;
 
@@ -54,10 +55,11 @@ public class MongoCollector {
             mongoDatabaseStats = null;
         }
 
+        final HostInfo hostInfo = stats.hostInfo();
         return MongoStats.create(
                 stats.buildInfo().version(),
                 stats.servers().size(),
-                stats.hostInfo() == null ? "unknown" : stats.hostInfo().system().cpuArch(),
+                hostInfo == null || hostInfo.system() == null ? "unknown" : hostInfo.system().cpuArch(),
                 mongoDatabaseStats
         );
     }
