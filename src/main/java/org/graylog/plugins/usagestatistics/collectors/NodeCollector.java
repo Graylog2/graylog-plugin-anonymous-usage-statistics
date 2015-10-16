@@ -15,8 +15,10 @@
  */
 package org.graylog.plugins.usagestatistics.collectors;
 
+import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.github.joschi.jadconfig.util.Duration;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.SystemUtils;
 import org.graylog.plugins.usagestatistics.UsageStatsMetaData;
@@ -35,6 +37,7 @@ import org.graylog.plugins.usagestatistics.dto.Os;
 import org.graylog.plugins.usagestatistics.dto.PluginInfo;
 import org.graylog.plugins.usagestatistics.dto.ThroughputStats;
 import org.graylog.plugins.usagestatistics.util.MetricUtils;
+import org.graylog2.inputs.Input;
 import org.graylog2.inputs.InputService;
 import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.ServerStatus;
@@ -50,8 +53,11 @@ import org.graylog2.shared.system.stats.os.OsStats;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import java.util.Map;
 import java.util.Set;
 
+import static com.codahale.metrics.MetricRegistry.name;
+import static com.google.common.base.MoreObjects.firstNonNull;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Strings.isNullOrEmpty;
 
@@ -195,15 +201,38 @@ public class NodeCollector {
 
     private NodeStats buildNodeStats() {
         final long uptime = (System.nanoTime() - JVM_START) / 1_000_000L;
+
+        // break down throughput numbers by input type
+        final Map<String, ThroughputStats.Throughput> perInputThroughput = Maps.newHashMap();
+        for (Input input : inputService.allOfThisNode(nodeId.toString())) {
+            final Meter incomingMessages = MetricUtils.safeGetMeter(metricRegistry,
+                                                                    name(input.getType(),
+                                                                         input.getId(),
+                                                                         "incomingMessages"));
+            final Meter rawSize = MetricUtils.safeGetMeter(metricRegistry,
+                                                           name(input.getType(), input.getId(), "rawSize"));
+            final ThroughputStats.Throughput throughput = firstNonNull(perInputThroughput.get(input.getType()),
+                                                                       ThroughputStats.Throughput.create(0, 0, 0));
+
+            perInputThroughput.put(input.getType(), ThroughputStats.Throughput.create(
+                    incomingMessages.getCount() + throughput.count(),
+                    0d /* not available at the moment */,
+                    rawSize.getCount() + throughput.size()));
+        }
+
         final ThroughputStats throughputStats = ThroughputStats.create(
                 ThroughputStats.Throughput.create(
                         MetricUtils.safeGetCounter(metricRegistry, "org.graylog2.throughput.input").getCount(),
-                        MetricUtils.safeGetDoubleGauge(metricRegistry, "org.graylog2.throughput.input.1-sec-rate").getValue()
+                        MetricUtils.safeGetDoubleGauge(metricRegistry, "org.graylog2.throughput.input.1-sec-rate").getValue(),
+                        MetricUtils.safeGetCounter(metricRegistry, "org.graylog2.throughput.input.size").getCount()
                 ),
                 ThroughputStats.Throughput.create(
                         MetricUtils.safeGetCounter(metricRegistry, "org.graylog2.throughput.output").getCount(),
-                        MetricUtils.safeGetDoubleGauge(metricRegistry, "org.graylog2.throughput.output.1-sec-rate").getValue()
-                )
+                        MetricUtils.safeGetDoubleGauge(metricRegistry, "org.graylog2.throughput.output.1-sec-rate").getValue(),
+                        0L /* we cannot track this number at the moment */
+                ),
+                perInputThroughput
+
         );
         final BufferStats bufferStats = BufferStats.create(
                 BufferStats.Buffer.create(

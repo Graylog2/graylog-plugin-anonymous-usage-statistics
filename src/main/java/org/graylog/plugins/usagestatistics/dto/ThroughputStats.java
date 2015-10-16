@@ -19,11 +19,13 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 
+import java.util.Map;
+
 @JsonAutoDetect
 @AutoValue
 public abstract class ThroughputStats {
-    public static ThroughputStats create(Throughput input, Throughput output) {
-        return new AutoValue_ThroughputStats(input, output);
+    public static ThroughputStats create(Throughput input, Throughput output, Map<String, Throughput> perInputType) {
+        return new AutoValue_ThroughputStats(input, output, perInputType);
     }
 
     @JsonProperty
@@ -32,11 +34,14 @@ public abstract class ThroughputStats {
     @JsonProperty
     public abstract Throughput output();
 
+    @JsonProperty
+    public abstract Map<String, Throughput> perInputType();
+
     @JsonAutoDetect
     @AutoValue
     public static abstract class Throughput {
-        public static Throughput create(long count, double lastSecond) {
-            return new AutoValue_ThroughputStats_Throughput(count, lastSecond);
+        public static Throughput create(long count, double lastSecond, long size) {
+            return new AutoValue_ThroughputStats_Throughput(count, lastSecond, size);
         }
 
         @JsonProperty
@@ -44,5 +49,8 @@ public abstract class ThroughputStats {
 
         @JsonProperty
         public abstract double lastSecond();
+
+        @JsonProperty
+        public abstract long size();
     }
 }

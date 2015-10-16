@@ -64,6 +64,6 @@ public class UsageStatsMetaData implements PluginMetaData {
 
     @Override
     public Version getRequiredVersion() {
-        return new Version(1, 1, 0);
+        return new Version(1, 3, 0);
     }
 }
