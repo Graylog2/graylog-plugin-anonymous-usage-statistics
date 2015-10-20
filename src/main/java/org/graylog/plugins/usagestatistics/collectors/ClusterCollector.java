@@ -21,6 +21,7 @@ import org.cliffc.high_scale_lib.Counter;
 import org.graylog.plugins.usagestatistics.UsageStatsMetaData;
 import org.graylog.plugins.usagestatistics.dto.ClusterDataSet;
 import org.graylog.plugins.usagestatistics.dto.ClusterStats;
+import org.graylog.plugins.usagestatistics.dto.LdapStats;
 import org.graylog2.indexer.counts.Counts;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.cluster.ClusterId;
@@ -97,7 +98,8 @@ public class ClusterCollector {
                 buildExtractorCountByType(),
                 clusterStats.contentPackCount(),
                 counts.total(),
-                buildStreamThroughput()
+                buildStreamThroughput(),
+                buildLdapStats()
         );
     }
 
@@ -115,5 +117,13 @@ public class ClusterCollector {
             builder.put(entry.getKey().name(), entry.getValue());
         }
         return builder.build();
+    }
+
+    private LdapStats buildLdapStats() {
+        final org.graylog2.system.stats.LdapStats ldapStats = clusterStatsService.ldapStats();
+        return LdapStats.create(ldapStats.enabled(),
+                                ldapStats.activeDirectory(),
+                                ldapStats.roleMappingCount(),
+                                ldapStats.roleCount());
     }
 }

@@ -45,7 +45,8 @@ public abstract class ClusterStats {
                                       Map<String, Long> extractorCountByType,
                                       long contentPackCount,
                                       long totalMessages,
-                                      Map<String, Long> streamThroughput
+                                      Map<String, Long> streamThroughput,
+                                      LdapStats ldapStats
     ) {
         return new AutoValue_ClusterStats(
                 elasticsearchCluster,
@@ -66,7 +67,8 @@ public abstract class ClusterStats {
                 extractorCountByType,
                 contentPackCount,
                 totalMessages,
-                streamThroughput);
+                streamThroughput,
+                ldapStats);
     }
 
     @JsonProperty
@@ -125,4 +127,7 @@ public abstract class ClusterStats {
 
     @JsonProperty
     public abstract Map<String, Long> streamThroughput();
+
+    @JsonProperty
+    public abstract LdapStats ldapStats();
 }
