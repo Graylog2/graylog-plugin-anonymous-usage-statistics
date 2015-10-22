@@ -35,6 +35,7 @@ import org.graylog.plugins.usagestatistics.dto.NodeRole;
 import org.graylog.plugins.usagestatistics.dto.NodeStats;
 import org.graylog.plugins.usagestatistics.dto.Os;
 import org.graylog.plugins.usagestatistics.dto.PluginInfo;
+import org.graylog.plugins.usagestatistics.dto.SessionStats;
 import org.graylog.plugins.usagestatistics.dto.ThroughputStats;
 import org.graylog.plugins.usagestatistics.util.MetricUtils;
 import org.graylog2.inputs.Input;
@@ -45,6 +46,8 @@ import org.graylog2.plugin.Version;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.cluster.ClusterId;
 import org.graylog2.plugin.system.NodeId;
+import org.graylog2.rest.resources.system.SessionsResource;
+import org.graylog2.security.realm.SessionAuthenticator;
 import org.graylog2.shared.system.stats.StatsService;
 import org.graylog2.shared.system.stats.jvm.JvmStats;
 import org.graylog2.shared.system.stats.network.NetworkStats;
@@ -60,6 +63,8 @@ import static com.codahale.metrics.MetricRegistry.name;
 import static com.google.common.base.MoreObjects.firstNonNull;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static org.graylog.plugins.usagestatistics.util.MetricUtils.safeGetCounter;
+import static org.graylog.plugins.usagestatistics.util.MetricUtils.safeGetMeter;
 
 @Singleton
 public class NodeCollector {
@@ -261,6 +266,14 @@ public class NodeCollector {
                 MetricUtils.safeGetHistogram(metricRegistry, "org.graylog2.indexer.searches.Searches.elasticsearch.ranges")
         );
 
+        final SessionStats sessionStats = SessionStats.create(
+                safeGetCounter(metricRegistry, name(SessionAuthenticator.class, "sessions-authenticated")).getCount(),
+                safeGetCounter(metricRegistry, name(SessionAuthenticator.class, "sessions-extended")).getCount(),
+                safeGetCounter(metricRegistry, name(SessionAuthenticator.class, "sessions-expired")).getCount(),
+                safeGetMeter(metricRegistry, name(SessionsResource.class, "newSession")).getCount(),
+                safeGetMeter(metricRegistry, name(SessionsResource.class, "terminateSession")).getCount()
+        );
+
         return NodeStats.create(
                 uptime,
                 inputService.totalCountForNode(nodeId.toString()),
@@ -268,7 +281,8 @@ public class NodeCollector {
                 bufferStats,
                 journalStats,
                 searchTimings,
-                searchRanges
+                searchRanges,
+                sessionStats
         );
     }
 
