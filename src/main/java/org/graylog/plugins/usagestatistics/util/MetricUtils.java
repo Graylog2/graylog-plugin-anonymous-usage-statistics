@@ -27,7 +27,7 @@ import com.codahale.metrics.UniformReservoir;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
-import static com.google.common.base.Objects.firstNonNull;
+import static com.google.common.base.MoreObjects.firstNonNull;
 
 public class MetricUtils {
     private static final Counter EMPTY_COUNTER = new Counter() {
