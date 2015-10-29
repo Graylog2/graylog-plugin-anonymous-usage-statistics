@@ -31,7 +31,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.net.MalformedURLException;
 import java.net.URL;
 
 @Singleton
@@ -103,7 +102,7 @@ public class UsageStatsNodePeriodical extends UsageStatsPeriodical {
 
     @Override
     public boolean startOnThisNode() {
-        return config.isEnabled() && !serverStatus.hasCapability(ServerStatus.Capability.LOCALMODE);
+        return isEnabled() && !serverStatus.hasCapability(ServerStatus.Capability.LOCALMODE);
     }
 
     @Override

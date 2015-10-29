@@ -93,7 +93,7 @@ public class UsageStatsClusterPeriodical extends UsageStatsPeriodical {
 
     @Override
     public boolean startOnThisNode() {
-        return config.isEnabled()
+        return isEnabled()
                 && serverStatus.hasCapability(ServerStatus.Capability.MASTER)
                 && !serverStatus.hasCapability(ServerStatus.Capability.LOCALMODE);
     }

@@ -29,6 +29,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -50,7 +51,7 @@ public class UsageStatsNodePeriodicalTest {
     @Before
     public void setUp() throws Exception {
         when(nodeId.anonymize()).thenReturn("test-node-id");
-        configuration = new UsageStatsConfiguration();
+        configuration = spy(new UsageStatsConfiguration());
         when(clusterConfigService.get(ClusterId.class)).thenReturn(ClusterId.create("test-cluster-id"));
         objectMapper = new SmileObjectMapperProvider().get();
         periodical = new UsageStatsNodePeriodical(
@@ -68,5 +69,29 @@ public class UsageStatsNodePeriodicalTest {
     public void testGetUrl() {
         assertThat(periodical.getUrl().toString())
                 .isEqualTo("https://stats-collector.graylog.com/submit/cluster/test-cluster-id/node/test-node-id");
+    }
+
+    @Test
+    public void testStartOnThisNode() throws Exception {
+        when(configuration.isEnabled()).thenReturn(true);
+        when(serverStatus.hasCapability(ServerStatus.Capability.LOCALMODE)).thenReturn(false);
+        assertThat(periodical.startOnThisNode()).isTrue();
+
+        when(configuration.isEnabled()).thenReturn(false);
+        when(serverStatus.hasCapability(ServerStatus.Capability.LOCALMODE)).thenReturn(false);
+        assertThat(periodical.startOnThisNode()).isFalse();
+
+        when(configuration.isEnabled()).thenReturn(true);
+        when(serverStatus.hasCapability(ServerStatus.Capability.LOCALMODE)).thenReturn(true);
+        assertThat(periodical.startOnThisNode()).isFalse();
+
+        when(configuration.isEnabled()).thenReturn(false);
+        when(serverStatus.hasCapability(ServerStatus.Capability.LOCALMODE)).thenReturn(true);
+        assertThat(periodical.startOnThisNode()).isFalse();
+
+        when(configuration.isEnabled()).thenReturn(true);
+        when(serverStatus.hasCapability(ServerStatus.Capability.LOCALMODE)).thenReturn(false);
+        when(clusterConfigService.get(UsageStatsOptOutState.class)).thenReturn(UsageStatsOptOutState.create(true));
+        assertThat(periodical.startOnThisNode()).isFalse();
     }
 }

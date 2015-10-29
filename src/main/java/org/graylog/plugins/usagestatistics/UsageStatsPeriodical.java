@@ -21,12 +21,10 @@ import com.google.common.collect.Lists;
 import com.google.common.net.HttpHeaders;
 import com.google.common.primitives.Ints;
 import com.squareup.okhttp.Headers;
-import com.squareup.okhttp.MediaType;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
-import org.graylog2.plugin.Version;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.periodical.Periodical;
 import org.joda.time.DateTime;
@@ -41,12 +39,11 @@ import java.net.URL;
 import java.util.List;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.graylog.plugins.usagestatistics.UsageStatsConstants.CONTENT_TYPE;
+import static org.graylog.plugins.usagestatistics.UsageStatsConstants.USAGE_STATS_VERSION;
+import static org.graylog.plugins.usagestatistics.UsageStatsConstants.USER_AGENT;
 
 public abstract class UsageStatsPeriodical extends Periodical {
-    private static final MediaType CONTENT_TYPE = MediaType.parse("application/x-jackson-smile");
-    private static final String USAGE_STATS_VERSION = UsageStatsMetaData.VERSION.toString();
-    private static final String USER_AGENT = "Graylog " + Version.CURRENT_CLASSPATH;
-
     protected final UsageStatsConfiguration config;
     protected final ClusterConfigService clusterConfigService;
     protected final EvictingQueue<UsageStatsRequest> cachedRequestsQueue;
@@ -74,8 +71,23 @@ public abstract class UsageStatsPeriodical extends Periodical {
 
     protected abstract URL getUrl();
 
+    protected boolean isEnabled() {
+        if (!config.isEnabled()) {
+            return false;
+        }
+
+        final UsageStatsOptOutState optOutState = clusterConfigService.get(UsageStatsOptOutState.class);
+
+        return optOutState == null || !optOutState.isOptOut();
+    }
+
     @Override
     public void doRun() {
+        if (!isEnabled()) {
+            log.debug("Anonymous usage statistics disabled: Not transmitting statistics");
+            return;
+        }
+
         log.debug("Anonymous usage statistics activated: Transmitting node statistics.");
         final byte[] requestBody = buildPayload();
 
