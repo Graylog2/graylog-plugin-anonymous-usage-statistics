@@ -102,7 +102,7 @@ public class UsageStatsNodePeriodical extends UsageStatsPeriodical {
 
     @Override
     public boolean startOnThisNode() {
-        return isEnabled() && !serverStatus.hasCapability(ServerStatus.Capability.LOCALMODE);
+        return config.isEnabled() && !serverStatus.hasCapability(ServerStatus.Capability.LOCALMODE);
     }
 
     @Override

@@ -75,12 +75,21 @@ public class UsageStatsOptOutService {
         return clusterConfigService.getOrDefault(UsageStatsOptOutState.class, UsageStatsOptOutState.create(false));
     }
 
-    public void createOptOut() {
+    public void createOptOut(final UsageStatsOptOutState optOutState) {
+        if (optOutState == null) {
+            return;
+        }
+        if (!optOutState.isOptOut()) {
+            LOG.debug("Disable opt-out in cluster config");
+            clusterConfigService.write(optOutState);
+            return;
+        }
+
         // Run the opt-out request outside of the calling thread so it does not block.
         executor.execute(new Runnable() {
             @Override
             public void run() {
-                clusterConfigService.write(UsageStatsOptOutState.create(true));
+                clusterConfigService.write(optOutState);
 
                 final URL url = getUrl();
 

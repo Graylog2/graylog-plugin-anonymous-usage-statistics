@@ -88,10 +88,32 @@ public class UsageStatsNodePeriodicalTest {
         when(configuration.isEnabled()).thenReturn(false);
         when(serverStatus.hasCapability(ServerStatus.Capability.LOCALMODE)).thenReturn(true);
         assertThat(periodical.startOnThisNode()).isFalse();
+    }
+
+    @Test
+    public void testIsEnabled() throws Exception {
+        when(configuration.isEnabled()).thenReturn(true);
+        when(clusterConfigService.get(UsageStatsOptOutState.class)).thenReturn(null);
+        assertThat(periodical.isEnabled()).isTrue();
 
         when(configuration.isEnabled()).thenReturn(true);
-        when(serverStatus.hasCapability(ServerStatus.Capability.LOCALMODE)).thenReturn(false);
+        when(clusterConfigService.get(UsageStatsOptOutState.class)).thenReturn(UsageStatsOptOutState.create(false));
+        assertThat(periodical.isEnabled()).isTrue();
+
+        when(configuration.isEnabled()).thenReturn(false);
+        when(clusterConfigService.get(UsageStatsOptOutState.class)).thenReturn(null);
+        assertThat(periodical.isEnabled()).isFalse();
+
+        when(configuration.isEnabled()).thenReturn(false);
+        when(clusterConfigService.get(UsageStatsOptOutState.class)).thenReturn(UsageStatsOptOutState.create(false));
+        assertThat(periodical.isEnabled()).isFalse();
+
+        when(configuration.isEnabled()).thenReturn(true);
         when(clusterConfigService.get(UsageStatsOptOutState.class)).thenReturn(UsageStatsOptOutState.create(true));
-        assertThat(periodical.startOnThisNode()).isFalse();
+        assertThat(periodical.isEnabled()).isFalse();
+
+        when(configuration.isEnabled()).thenReturn(false);
+        when(clusterConfigService.get(UsageStatsOptOutState.class)).thenReturn(UsageStatsOptOutState.create(true));
+        assertThat(periodical.isEnabled()).isFalse();
     }
 }
