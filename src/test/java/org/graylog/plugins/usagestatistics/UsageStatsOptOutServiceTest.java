@@ -23,14 +23,12 @@ import com.squareup.okhttp.mockwebserver.MockResponse;
 import com.squareup.okhttp.mockwebserver.MockWebServer;
 import com.squareup.okhttp.mockwebserver.RecordedRequest;
 import org.graylog.plugins.usagestatistics.providers.SmileObjectMapperProvider;
-import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.cluster.ClusterId;
 import org.graylog2.shared.bindings.providers.OkHttpClientProvider;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
@@ -47,9 +45,7 @@ import static org.mockito.Mockito.when;
 public class UsageStatsOptOutServiceTest {
     public static final MockResponse OPT_OUT_RESPONSE = new MockResponse().setResponseCode(202);
 
-    @Mock
-    private ClusterConfigService clusterConfigService;
-
+    private TestClusterConfigService clusterConfigService;
     private UsageStatsConfiguration configSpy = spy(new UsageStatsConfiguration());
     private ObjectMapper objectMapper = new SmileObjectMapperProvider().get();
     private UsageStatsOptOutService optOutService;
@@ -64,11 +60,13 @@ public class UsageStatsOptOutServiceTest {
     public void setUp() throws Exception {
         webserver.start();
 
-        when(clusterConfigService.get(ClusterId.class)).thenReturn(ClusterId.create("test-cluster-id"));
         when(configSpy.getUrl()).thenReturn(webserver.url("/submit/").uri());
 
+        this.clusterConfigService = new TestClusterConfigService();
         this.optOutService = new UsageStatsOptOutService(clusterConfigService,
                 configSpy, clientProvider.get(), objectMapper, MoreExecutors.newDirectExecutorService());
+
+        clusterConfigService.write(ClusterId.create("test-cluster-id"));
     }
 
     @After
@@ -78,13 +76,13 @@ public class UsageStatsOptOutServiceTest {
 
     @Test
     public void testGetOptOutState() throws Exception {
-        when(clusterConfigService.get(UsageStatsOptOutState.class)).thenReturn(null);
+        clusterConfigService.clear();
         assertThat(optOutService.getOptOutState().isOptOut()).isFalse();
 
-        when(clusterConfigService.get(UsageStatsOptOutState.class)).thenReturn(UsageStatsOptOutState.create(false));
+        clusterConfigService.write(UsageStatsOptOutState.create(false));
         assertThat(optOutService.getOptOutState().isOptOut()).isFalse();
 
-        when(clusterConfigService.get(UsageStatsOptOutState.class)).thenReturn(UsageStatsOptOutState.create(true));
+        clusterConfigService.write(UsageStatsOptOutState.create(true));
         assertThat(optOutService.getOptOutState().isOptOut()).isTrue();
     }
 
@@ -106,7 +104,7 @@ public class UsageStatsOptOutServiceTest {
 
     @Test
     public void testCreateOptOutWithNullClusterId() throws Exception {
-        when(clusterConfigService.get(ClusterId.class)).thenReturn(null);
+        clusterConfigService.remove(ClusterId.class);
 
         optOutService.createOptOut();
 
@@ -124,7 +122,7 @@ public class UsageStatsOptOutServiceTest {
 
     @Test
     public void testGetUrlWithoutClusterId() throws Exception {
-        when(clusterConfigService.get(ClusterId.class)).thenReturn(null);
+        clusterConfigService.remove(ClusterId.class);
 
         assertThat(optOutService.getUrl()).isNull();
     }

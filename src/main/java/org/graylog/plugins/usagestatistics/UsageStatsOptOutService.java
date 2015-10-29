@@ -72,9 +72,7 @@ public class UsageStatsOptOutService {
     }
 
     public UsageStatsOptOutState getOptOutState() {
-        final UsageStatsOptOutState optOutState = clusterConfigService.get(UsageStatsOptOutState.class);
-
-        return optOutState == null ? UsageStatsOptOutState.create(false) : optOutState;
+        return clusterConfigService.getOrDefault(UsageStatsOptOutState.class, UsageStatsOptOutState.create(false));
     }
 
     public void createOptOut() {
@@ -134,6 +132,7 @@ public class UsageStatsOptOutService {
         }
     }
 
+    @Nullable
     protected byte[] buildPayload() {
         try {
             return objectMapper.writeValueAsBytes(ImmutableMap.<String, String>builder().build());

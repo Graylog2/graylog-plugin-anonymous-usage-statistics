@@ -23,7 +23,7 @@ import com.google.auto.value.AutoValue;
 @JsonAutoDetect
 @AutoValue
 public abstract class UsageStatsOptOutState {
-    @JsonProperty
+    @JsonProperty("opt_out")
     public abstract boolean isOptOut();
 
     @JsonCreator
