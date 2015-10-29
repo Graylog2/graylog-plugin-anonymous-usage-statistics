@@ -23,15 +23,14 @@ import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
 import com.squareup.okhttp.mockwebserver.MockResponse;
+import com.squareup.okhttp.mockwebserver.MockWebServer;
 import com.squareup.okhttp.mockwebserver.RecordedRequest;
-import com.squareup.okhttp.mockwebserver.rule.MockWebServerRule;
 import okio.BufferedSource;
 import okio.GzipSource;
 import okio.Okio;
 import okio.Source;
 import org.graylog.plugins.usagestatistics.providers.CompressingOkHttpClientProvider;
 import org.graylog2.shared.bindings.providers.OkHttpClientProvider;
-import org.junit.Rule;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
@@ -40,8 +39,7 @@ import java.nio.charset.StandardCharsets;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class GzipRequestInterceptorTest {
-    @Rule
-    public MockWebServerRule mockWebServerRule = new MockWebServerRule();
+    public final MockWebServer mockWebServer = new MockWebServer();
 
     private final OkHttpClientProvider clientProvider = new OkHttpClientProvider(
             Duration.seconds(1L),
@@ -53,17 +51,17 @@ public class GzipRequestInterceptorTest {
     public void httpClientUsesGzipInRequests() throws Exception {
         CompressingOkHttpClientProvider provider = new CompressingOkHttpClientProvider(clientProvider, true);
         OkHttpClient client = provider.get();
-        mockWebServerRule.enqueue(new MockResponse().setResponseCode(202));
+        mockWebServer.enqueue(new MockResponse().setResponseCode(202));
 
         Request request = new Request.Builder()
-                .url(mockWebServerRule.getUrl("/test"))
+                .url(mockWebServer.url("/test"))
                 .post(RequestBody.create(MediaType.parse("text/plain; charset=utf-8"), "Test"))
                 .build();
         Response response = client.newCall(request).execute();
 
         assertThat(response.isSuccessful()).isTrue();
 
-        RecordedRequest recordedRequest = mockWebServerRule.takeRequest();
+        RecordedRequest recordedRequest = mockWebServer.takeRequest();
         assertThat(recordedRequest.getHeader(HttpHeaders.CONTENT_ENCODING)).isEqualTo("gzip");
         assertThat(recordedRequest.getHeader(HttpHeaders.CONTENT_TYPE)).isEqualTo("text/plain; charset=utf-8");
 
