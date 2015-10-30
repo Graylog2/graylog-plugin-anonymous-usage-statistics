@@ -19,6 +19,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.util.concurrent.MoreExecutors;
+import com.squareup.okhttp.Dispatcher;
+import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.mockwebserver.MockResponse;
 import com.squareup.okhttp.mockwebserver.MockWebServer;
 import com.squareup.okhttp.mockwebserver.RecordedRequest;
@@ -58,13 +60,18 @@ public class UsageStatsOptOutServiceTest {
 
     @Before
     public void setUp() throws Exception {
+        final OkHttpClient httpClient = clientProvider.get();
+
+        // Use a direct executor for the Dispatcher to avoid async calls during tests.
+        httpClient.setDispatcher(new Dispatcher(MoreExecutors.newDirectExecutorService()));
+
         webserver.start();
 
         when(configSpy.getUrl()).thenReturn(webserver.url("/submit/").uri());
 
         this.clusterConfigService = new TestClusterConfigService();
         this.optOutService = new UsageStatsOptOutService(clusterConfigService,
-                configSpy, clientProvider.get(), objectMapper, MoreExecutors.newDirectExecutorService());
+                configSpy, httpClient, objectMapper);
 
         clusterConfigService.write(ClusterId.create("test-cluster-id"));
     }

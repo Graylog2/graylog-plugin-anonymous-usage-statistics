@@ -18,6 +18,7 @@ package org.graylog.plugins.usagestatistics;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
+import com.squareup.okhttp.Callback;
 import com.squareup.okhttp.Headers;
 import com.squareup.okhttp.HttpUrl;
 import com.squareup.okhttp.OkHttpClient;
@@ -35,8 +36,6 @@ import javax.inject.Inject;
 import javax.ws.rs.core.HttpHeaders;
 import java.io.IOException;
 import java.net.URL;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 
 import static org.graylog.plugins.usagestatistics.UsageStatsConstants.CONTENT_TYPE;
 import static org.graylog.plugins.usagestatistics.UsageStatsConstants.USAGE_STATS_VERSION;
@@ -47,7 +46,6 @@ public class UsageStatsOptOutService {
 
     private final ClusterConfigService clusterConfigService;
     private final UsageStatsConfiguration config;
-    private final Executor executor;
     private final OkHttpClient httpClient;
     private final ObjectMapper objectMapper;
 
@@ -56,17 +54,8 @@ public class UsageStatsOptOutService {
                                    UsageStatsConfiguration config,
                                    OkHttpClient httpClient,
                                    @SmileObjectMapper ObjectMapper objectMapper) {
-        this(clusterConfigService, config, httpClient, objectMapper, Executors.newSingleThreadExecutor());
-    }
-
-    protected UsageStatsOptOutService(ClusterConfigService clusterConfigService,
-                                      UsageStatsConfiguration config,
-                                      OkHttpClient httpClient,
-                                      ObjectMapper objectMapper,
-                                      Executor executor) {
         this.clusterConfigService = clusterConfigService;
         this.config = config;
-        this.executor = executor;
         this.httpClient = httpClient;
         this.objectMapper = objectMapper;
     }
@@ -79,45 +68,46 @@ public class UsageStatsOptOutService {
         if (optOutState == null) {
             return;
         }
-        if (!optOutState.isOptOut()) {
-            LOG.debug("Disable opt-out in cluster config");
-            clusterConfigService.write(optOutState);
+
+        LOG.debug("Writing opt-out state to cluster config: {}", optOutState);
+        clusterConfigService.write(optOutState);
+
+        if (optOutState.isOptOut()) {
+            LOG.info("Transmission of anonymous usage stats: disabled (opt-out)");
+        } else {
+            LOG.info("Transmission of anonymous usage stats: enabled (opt-in)");
+            LOG.debug("Not sending opt-in request.");
             return;
         }
 
+        final URL url = getUrl();
+
+        if (url == null) {
+            LOG.debug("Not sending opt-out request, 'usage_statistics_url' is not set.");
+            return;
+        }
+
+        final Headers headers = new Headers.Builder()
+                .add(HttpHeaders.USER_AGENT, USER_AGENT)
+                .add("X-Usage-Statistics-Version", USAGE_STATS_VERSION)
+                .build();
+
+        final Request request = new Request.Builder()
+                .url(url)
+                .headers(headers)
+                .post(RequestBody.create(CONTENT_TYPE, buildPayload()))
+                .build();
+
         // Run the opt-out request outside of the calling thread so it does not block.
-        executor.execute(new Runnable() {
+        httpClient.newCall(request).enqueue(new Callback() {
             @Override
-            public void run() {
-                clusterConfigService.write(optOutState);
+            public void onFailure(Request request, IOException e) {
+                LOG.error("Error while sending anonymous usage statistics opt-out");
+                LOG.debug("Error details", e);
+            }
 
-                final URL url = getUrl();
-
-                if (url == null) {
-                    LOG.debug("Not sending opt-out request, 'usage_statistics_url' is not set.");
-                    return;
-                }
-
-                final Headers headers = new Headers.Builder()
-                        .add(HttpHeaders.USER_AGENT, USER_AGENT)
-                        .add("X-Usage-Statistics-Version", USAGE_STATS_VERSION)
-                        .build();
-
-                final Request request = new Request.Builder()
-                        .url(url)
-                        .headers(headers)
-                        .post(RequestBody.create(CONTENT_TYPE, buildPayload()))
-                        .build();
-
-                final Response response;
-                try {
-                    response = httpClient.newCall(request).execute();
-                } catch (IOException e) {
-                    LOG.error("Error while sending anonymous usage statistics opt-out");
-                    LOG.debug("Error details", e);
-                    return;
-                }
-
+            @Override
+            public void onResponse(Response response) throws IOException {
                 if (!response.isSuccessful()) {
                     LOG.warn("Couldn't successfully send usage statistics opt-out: {}", response);
                 }
