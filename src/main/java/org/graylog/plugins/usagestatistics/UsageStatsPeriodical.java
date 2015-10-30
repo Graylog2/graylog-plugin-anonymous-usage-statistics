@@ -76,9 +76,10 @@ public abstract class UsageStatsPeriodical extends Periodical {
             return false;
         }
 
-        final UsageStatsOptOutState optOutState = clusterConfigService.get(UsageStatsOptOutState.class);
+        final UsageStatsOptOutState state = clusterConfigService.getOrDefault(UsageStatsOptOutState.class,
+                UsageStatsOptOutState.create(false));
 
-        return optOutState == null || !optOutState.isOptOut();
+        return !state.isOptOut();
     }
 
     @Override

@@ -19,7 +19,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.squareup.okhttp.OkHttpClient;
 import org.graylog.plugins.usagestatistics.providers.SmileObjectMapperProvider;
 import org.graylog2.plugin.ServerStatus;
-import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.cluster.ClusterId;
 import org.graylog2.plugin.system.NodeId;
 import org.junit.Before;
@@ -42,9 +41,9 @@ public class UsageStatsNodePeriodicalTest {
     private ServerStatus serverStatus;
     private UsageStatsConfiguration configuration;
     @Mock
-    private ClusterConfigService clusterConfigService;
-    @Mock
     private OkHttpClient httpClient;
+
+    private TestClusterConfigService clusterConfigService;
     private ObjectMapper objectMapper;
     private UsageStatsNodePeriodical periodical;
 
@@ -52,7 +51,8 @@ public class UsageStatsNodePeriodicalTest {
     public void setUp() throws Exception {
         when(nodeId.anonymize()).thenReturn("test-node-id");
         configuration = spy(new UsageStatsConfiguration());
-        when(clusterConfigService.get(ClusterId.class)).thenReturn(ClusterId.create("test-cluster-id"));
+
+        clusterConfigService = new TestClusterConfigService();
         objectMapper = new SmileObjectMapperProvider().get();
         periodical = new UsageStatsNodePeriodical(
                 nodeService,
@@ -63,6 +63,8 @@ public class UsageStatsNodePeriodicalTest {
                 httpClient,
                 objectMapper
         );
+
+        clusterConfigService.write(ClusterId.create("test-cluster-id"));
     }
 
     @Test
@@ -93,27 +95,27 @@ public class UsageStatsNodePeriodicalTest {
     @Test
     public void testIsEnabled() throws Exception {
         when(configuration.isEnabled()).thenReturn(true);
-        when(clusterConfigService.get(UsageStatsOptOutState.class)).thenReturn(null);
+        clusterConfigService.remove(AutoValue_UsageStatsOptOutState.class);
         assertThat(periodical.isEnabled()).isTrue();
 
         when(configuration.isEnabled()).thenReturn(true);
-        when(clusterConfigService.get(UsageStatsOptOutState.class)).thenReturn(UsageStatsOptOutState.create(false));
+        clusterConfigService.write(UsageStatsOptOutState.create(false));
         assertThat(periodical.isEnabled()).isTrue();
 
         when(configuration.isEnabled()).thenReturn(false);
-        when(clusterConfigService.get(UsageStatsOptOutState.class)).thenReturn(null);
+        clusterConfigService.remove(AutoValue_UsageStatsOptOutState.class);
         assertThat(periodical.isEnabled()).isFalse();
 
         when(configuration.isEnabled()).thenReturn(false);
-        when(clusterConfigService.get(UsageStatsOptOutState.class)).thenReturn(UsageStatsOptOutState.create(false));
+        clusterConfigService.write(UsageStatsOptOutState.create(false));
         assertThat(periodical.isEnabled()).isFalse();
 
         when(configuration.isEnabled()).thenReturn(true);
-        when(clusterConfigService.get(UsageStatsOptOutState.class)).thenReturn(UsageStatsOptOutState.create(true));
+        clusterConfigService.write(UsageStatsOptOutState.create(true));
         assertThat(periodical.isEnabled()).isFalse();
 
         when(configuration.isEnabled()).thenReturn(false);
-        when(clusterConfigService.get(UsageStatsOptOutState.class)).thenReturn(UsageStatsOptOutState.create(true));
+        clusterConfigService.write(UsageStatsOptOutState.create(true));
         assertThat(periodical.isEnabled()).isFalse();
     }
 }
