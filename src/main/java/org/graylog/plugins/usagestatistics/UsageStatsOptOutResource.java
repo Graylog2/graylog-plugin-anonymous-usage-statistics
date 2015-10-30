@@ -24,8 +24,9 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.shared.rest.resources.RestResource;
 
-import javax.annotation.Nullable;
 import javax.inject.Inject;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -65,11 +66,7 @@ public class UsageStatsOptOutResource extends RestResource implements PluginRest
             @ApiResponse(code = 400, message = "Missing or invalid opt-out state"),
             @ApiResponse(code = 500, message = "Internal Server Error")
     })
-    public Response optOut(@Nullable UsageStatsOptOutState optOutState) {
-        if (optOutState == null) {
-            return Response.status(Response.Status.BAD_REQUEST).build();
-        }
-
+    public Response optOut(@Valid @NotNull UsageStatsOptOutState optOutState) {
         usageStatsOptOutService.createOptOut(optOutState);
 
         return Response.noContent().build();
