@@ -15,7 +15,7 @@
  */
 package org.graylog.plugins.usagestatistics;
 
-import org.assertj.core.util.Maps;
+import com.google.common.collect.Maps;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.shared.utilities.AutoValueUtils;
 
@@ -24,7 +24,7 @@ import java.util.Map;
 import static com.google.common.base.MoreObjects.firstNonNull;
 
 public class TestClusterConfigService implements ClusterConfigService {
-    private final Map<String, Object> data = Maps.newConcurrentHashMap();
+    private final Map<String, Object> data = Maps.newConcurrentMap();
 
     @SuppressWarnings("unchecked")
     public <T> T get(Class<T> type) {
