@@ -64,7 +64,7 @@ public class UsageStatsOptOutService {
         return clusterConfigService.getOrDefault(UsageStatsOptOutState.class, UsageStatsOptOutState.create(false));
     }
 
-    public void createOptOut(final UsageStatsOptOutState optOutState) {
+    public void setOptOutState(final UsageStatsOptOutState optOutState) {
         if (optOutState == null) {
             return;
         }

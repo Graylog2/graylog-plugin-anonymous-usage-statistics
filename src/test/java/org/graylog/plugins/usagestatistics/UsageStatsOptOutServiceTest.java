@@ -97,7 +97,7 @@ public class UsageStatsOptOutServiceTest {
     public void testCreateOptOut() throws Exception {
         webserver.enqueue(OPT_OUT_RESPONSE);
 
-        optOutService.createOptOut(UsageStatsOptOutState.create(true));
+        optOutService.setOptOutState(UsageStatsOptOutState.create(true));
 
         assertThat(webserver.getRequestCount()).isEqualTo(1);
 
@@ -117,7 +117,7 @@ public class UsageStatsOptOutServiceTest {
 
         webserver.enqueue(OPT_OUT_RESPONSE);
 
-        optOutService.createOptOut(UsageStatsOptOutState.create(false));
+        optOutService.setOptOutState(UsageStatsOptOutState.create(false));
 
         assertThat(webserver.getRequestCount()).isEqualTo(0);
         assertThat(clusterConfigService.get(UsageStatsOptOutState.class)).isEqualTo(UsageStatsOptOutState.create(false));
@@ -127,7 +127,7 @@ public class UsageStatsOptOutServiceTest {
     public void testCreateOptOutWithNullParam() throws Exception {
         webserver.enqueue(OPT_OUT_RESPONSE);
 
-        optOutService.createOptOut(null);
+        optOutService.setOptOutState(null);
 
         assertThat(webserver.getRequestCount()).isEqualTo(0);
         assertThat(clusterConfigService.get(UsageStatsOptOutState.class)).isNull();
@@ -137,7 +137,7 @@ public class UsageStatsOptOutServiceTest {
     public void testCreateOptOutWithNullClusterId() throws Exception {
         clusterConfigService.remove(ClusterId.class);
 
-        optOutService.createOptOut(UsageStatsOptOutState.create(true));
+        optOutService.setOptOutState(UsageStatsOptOutState.create(true));
 
         assertThat(webserver.getRequestCount()).isEqualTo(0);
     }

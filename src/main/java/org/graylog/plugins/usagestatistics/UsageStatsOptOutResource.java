@@ -66,6 +66,6 @@ public class UsageStatsOptOutResource extends RestResource implements PluginRest
             @ApiResponse(code = 500, message = "Internal Server Error")
     })
     public void setOptOutState(@Valid @NotNull UsageStatsOptOutState optOutState) {
-        usageStatsOptOutService.createOptOut(optOutState);
+        usageStatsOptOutService.setOptOutState(optOutState);
     }
 }
