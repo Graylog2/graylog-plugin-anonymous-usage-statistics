@@ -33,7 +33,6 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 
 @RequiresAuthentication
 @Api(value = "Usage Statistics Opt-Out", description = "Anonymous usage statistics opt-out state of this Graylog setup")
@@ -66,9 +65,7 @@ public class UsageStatsOptOutResource extends RestResource implements PluginRest
             @ApiResponse(code = 400, message = "Missing or invalid opt-out state"),
             @ApiResponse(code = 500, message = "Internal Server Error")
     })
-    public Response setOptOutState(@Valid @NotNull UsageStatsOptOutState optOutState) {
+    public void setOptOutState(@Valid @NotNull UsageStatsOptOutState optOutState) {
         usageStatsOptOutService.createOptOut(optOutState);
-
-        return Response.noContent().build();
     }
 }
