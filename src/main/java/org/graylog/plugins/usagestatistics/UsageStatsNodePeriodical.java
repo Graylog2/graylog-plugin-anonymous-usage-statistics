@@ -31,7 +31,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.net.MalformedURLException;
 import java.net.URL;
 
 @Singleton

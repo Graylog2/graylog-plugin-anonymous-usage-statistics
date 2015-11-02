@@ -55,6 +55,7 @@ public class UsageStatsModule extends PluginModule {
         addPeriodical(UsageStatsNodePeriodical.class);
         addPeriodical(UsageStatsClusterPeriodical.class);
         addRestResource(UsageStatsResource.class);
+        addRestResource(UsageStatsOptOutResource.class);
 
         addConfigBeans();
     }
