@@ -84,7 +84,7 @@ public class UsageStatsOptOutServiceTest {
     @Test
     public void testGetOptOutState() throws Exception {
         clusterConfigService.clear();
-        assertThat(optOutService.getOptOutState().isOptOut()).isFalse();
+        assertThat(optOutService.getOptOutState()).isNull();
 
         clusterConfigService.write(UsageStatsOptOutState.create(false));
         assertThat(optOutService.getOptOutState().isOptOut()).isFalse();
