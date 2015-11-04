@@ -56,6 +56,7 @@ public class UsageStatsOptOutResource extends RestResource implements PluginRest
     @Timed
     @ApiOperation(value = "Get opt-out status")
     @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "Opt-out status does not exist"),
             @ApiResponse(code = 500, message = "Internal Server Error")
     })
     public UsageStatsOptOutState getOptOutState() {
