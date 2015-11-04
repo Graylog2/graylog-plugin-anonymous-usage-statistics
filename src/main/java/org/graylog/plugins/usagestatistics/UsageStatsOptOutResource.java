@@ -29,15 +29,21 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
+import static org.graylog2.shared.security.RestPermissions.CLUSTER_CONFIG_ENTRY_CREATE;
+import static org.graylog2.shared.security.RestPermissions.CLUSTER_CONFIG_ENTRY_READ;
+
 @RequiresAuthentication
 @Api(value = "Usage Statistics Opt-Out", description = "Anonymous usage statistics opt-out state of this Graylog setup")
 @Path("/opt-out")
 public class UsageStatsOptOutResource extends RestResource implements PluginRestResource {
+    private static final String CLUSTER_CONFIG_INSTANCE = UsageStatsOptOutState.class.getCanonicalName();
+
     private final UsageStatsOptOutService usageStatsOptOutService;
 
     @Inject
@@ -50,10 +56,19 @@ public class UsageStatsOptOutResource extends RestResource implements PluginRest
     @Timed
     @ApiOperation(value = "Get opt-out status")
     @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "Opt-out status does not exist"),
             @ApiResponse(code = 500, message = "Internal Server Error")
     })
     public UsageStatsOptOutState getOptOutState() {
-        return usageStatsOptOutService.getOptOutState();
+        checkPermission(CLUSTER_CONFIG_ENTRY_READ, CLUSTER_CONFIG_INSTANCE);
+
+        final UsageStatsOptOutState optOutState = usageStatsOptOutService.getOptOutState();
+
+        if (optOutState == null) {
+            throw new NotFoundException();
+        }
+
+        return optOutState;
     }
 
     @POST
@@ -66,6 +81,8 @@ public class UsageStatsOptOutResource extends RestResource implements PluginRest
             @ApiResponse(code = 500, message = "Internal Server Error")
     })
     public void setOptOutState(@Valid @NotNull UsageStatsOptOutState optOutState) {
+        checkPermission(CLUSTER_CONFIG_ENTRY_CREATE, CLUSTER_CONFIG_INSTANCE);
+
         usageStatsOptOutService.setOptOutState(optOutState);
     }
 }

@@ -60,8 +60,9 @@ public class UsageStatsOptOutService {
         this.objectMapper = objectMapper;
     }
 
+    @Nullable
     public UsageStatsOptOutState getOptOutState() {
-        return clusterConfigService.getOrDefault(UsageStatsOptOutState.class, UsageStatsOptOutState.create(false));
+        return clusterConfigService.get(UsageStatsOptOutState.class);
     }
 
     public void setOptOutState(final UsageStatsOptOutState optOutState) {
