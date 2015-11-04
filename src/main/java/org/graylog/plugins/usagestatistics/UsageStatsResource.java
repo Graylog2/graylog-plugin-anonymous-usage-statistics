@@ -38,12 +38,24 @@ import javax.ws.rs.core.MediaType;
 public class UsageStatsResource extends RestResource implements PluginRestResource {
     private final UsageStatsNodeService usageStatsNodeService;
     private final UsageStatsClusterService usageStatsClusterService;
+    private final UsageStatsConfiguration configuration;
 
     @Inject
     public UsageStatsResource(UsageStatsNodeService usageStatsNodeService,
-                              UsageStatsClusterService usageStatsClusterService) {
+                              UsageStatsClusterService usageStatsClusterService,
+                              UsageStatsConfiguration configuration) {
         this.usageStatsNodeService = usageStatsNodeService;
         this.usageStatsClusterService = usageStatsClusterService;
+        this.configuration = configuration;
+    }
+
+    @GET
+    @Path("config")
+    @Timed
+    @ApiOperation(value = "Show configuration for the anonymous usage statistics plugin")
+    @Produces(MediaType.APPLICATION_JSON)
+    public UsageStatsConfigurationResponse showConfig() {
+        return UsageStatsConfigurationResponse.create(configuration.isEnabled());
     }
 
     @GET
