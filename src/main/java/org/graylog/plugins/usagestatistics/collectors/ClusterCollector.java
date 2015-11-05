@@ -19,6 +19,7 @@ import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.collect.ImmutableMap;
 import org.cliffc.high_scale_lib.Counter;
 import org.graylog.plugins.usagestatistics.UsageStatsMetaData;
+import org.graylog.plugins.usagestatistics.dto.AlarmStats;
 import org.graylog.plugins.usagestatistics.dto.ClusterDataSet;
 import org.graylog.plugins.usagestatistics.dto.ClusterStats;
 import org.graylog.plugins.usagestatistics.dto.LdapStats;
@@ -99,7 +100,8 @@ public class ClusterCollector {
                 clusterStats.contentPackCount(),
                 counts.total(),
                 buildStreamThroughput(),
-                buildLdapStats()
+                buildLdapStats(),
+                buildAlarmStats()
         );
     }
 
@@ -125,5 +127,10 @@ public class ClusterCollector {
                                 ldapStats.activeDirectory(),
                                 ldapStats.roleMappingCount(),
                                 ldapStats.roleCount());
+    }
+
+    private AlarmStats buildAlarmStats() {
+        final org.graylog2.system.stats.AlarmStats stats = clusterStatsService.alarmStats();
+        return AlarmStats.create(stats.alertCount(), stats.alarmcallbackCountByType());
     }
 }
