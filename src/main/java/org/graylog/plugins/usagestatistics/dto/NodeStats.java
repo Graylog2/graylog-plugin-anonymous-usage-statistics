@@ -29,6 +29,7 @@ public abstract class NodeStats {
                                    JournalStats journalStats,
                                    Histogram searchTimings,
                                    Histogram searchRanges,
+                                   SearchStats searchStats,
                                    SessionStats sessionStats) {
         return new AutoValue_NodeStats(uptime,
                                        inputCount,
@@ -37,6 +38,7 @@ public abstract class NodeStats {
                                        journalStats,
                                        searchTimings,
                                        searchRanges,
+                                       searchStats,
                                        sessionStats);
     }
 
@@ -60,6 +62,9 @@ public abstract class NodeStats {
 
     @JsonProperty
     public abstract Histogram searchRanges();
+
+    @JsonProperty
+    public abstract SearchStats searchStats();
 
     @JsonProperty
     public abstract SessionStats sessionStats();
