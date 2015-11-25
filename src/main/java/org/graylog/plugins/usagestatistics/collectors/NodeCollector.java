@@ -78,6 +78,7 @@ public class NodeCollector {
     private final ClusterConfigService clusterConfigService;
     private final Set<PluginMetaData> plugins;
     private final long reportIntervalMs;
+    private final String installationSource;
 
     @Inject
     public NodeCollector(NodeId nodeId,
@@ -87,7 +88,8 @@ public class NodeCollector {
                          InputService inputService,
                          ClusterConfigService clusterConfigService,
                          Set<PluginMetaData> plugins,
-                         @Named("usage_statistics_report_interval") Duration reportInterval) {
+                         @Named("usage_statistics_report_interval") Duration reportInterval,
+                         @Named("installation_source") String installationSource) {
         this.nodeId = checkNotNull(nodeId);
         this.serverStatus = checkNotNull(serverStatus);
         this.metricRegistry = checkNotNull(metricRegistry);
@@ -96,6 +98,7 @@ public class NodeCollector {
         this.clusterConfigService = checkNotNull(clusterConfigService);
         this.plugins = checkNotNull(plugins);
         this.reportIntervalMs = checkNotNull(reportInterval).toMilliseconds();
+        this.installationSource = checkNotNull(installationSource);
     }
 
     public NodeDataSet getNodeDataSet() {
@@ -120,7 +123,8 @@ public class NodeCollector {
                 NodeRole.fromCapabilities(serverStatus),
                 Version.CURRENT_CLASSPATH.toString(),
                 buildPluginInfo(plugins),
-                buildOsInfo()
+                buildOsInfo(),
+                installationSource
         );
     }
 

@@ -27,8 +27,9 @@ public abstract class NodeInfo {
     public static NodeInfo create(NodeRole role,
                                   String serverVersion,
                                   Set<PluginInfo> plugins,
-                                  Os os) {
-        return new AutoValue_NodeInfo(role, serverVersion, plugins, os);
+                                  Os os,
+                                  String installationSource) {
+        return new AutoValue_NodeInfo(role, serverVersion, plugins, os, installationSource);
     }
 
     @JsonProperty
@@ -42,4 +43,7 @@ public abstract class NodeInfo {
 
     @JsonProperty
     public abstract Os os();
+
+    @JsonProperty
+    public abstract String installationSource();
 }
