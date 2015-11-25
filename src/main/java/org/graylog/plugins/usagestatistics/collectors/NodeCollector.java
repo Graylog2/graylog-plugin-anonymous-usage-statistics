@@ -35,9 +35,11 @@ import org.graylog.plugins.usagestatistics.dto.NodeRole;
 import org.graylog.plugins.usagestatistics.dto.NodeStats;
 import org.graylog.plugins.usagestatistics.dto.Os;
 import org.graylog.plugins.usagestatistics.dto.PluginInfo;
+import org.graylog.plugins.usagestatistics.dto.SearchStats;
 import org.graylog.plugins.usagestatistics.dto.SessionStats;
 import org.graylog.plugins.usagestatistics.dto.ThroughputStats;
 import org.graylog.plugins.usagestatistics.util.MetricUtils;
+import org.graylog2.indexer.elasticsearch.GlobalTimeoutClient;
 import org.graylog2.inputs.Input;
 import org.graylog2.inputs.InputService;
 import org.graylog2.plugin.PluginMetaData;
@@ -46,6 +48,10 @@ import org.graylog2.plugin.Version;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.cluster.ClusterId;
 import org.graylog2.plugin.system.NodeId;
+import org.graylog2.rest.resources.search.AbsoluteSearchResource;
+import org.graylog2.rest.resources.search.KeywordSearchResource;
+import org.graylog2.rest.resources.search.RelativeSearchResource;
+import org.graylog2.rest.resources.search.SearchResource;
 import org.graylog2.rest.resources.system.SessionsResource;
 import org.graylog2.security.realm.SessionAuthenticator;
 import org.graylog2.shared.system.stats.StatsService;
@@ -65,6 +71,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.graylog.plugins.usagestatistics.util.MetricUtils.safeGetCounter;
 import static org.graylog.plugins.usagestatistics.util.MetricUtils.safeGetMeter;
+import static org.graylog.plugins.usagestatistics.util.MetricUtils.safeGetTimer;
 
 @Singleton
 public class NodeCollector {
@@ -278,6 +285,14 @@ public class NodeCollector {
                 safeGetMeter(metricRegistry, name(SessionsResource.class, "terminateSession")).getCount()
         );
 
+        final SearchStats searchStats = SearchStats.create(
+                safeGetCounter(metricRegistry, name(SearchResource.class, "empty-search-results")).getCount(),
+                safeGetTimer(metricRegistry, name(AbsoluteSearchResource.class, "searchAbsolute")).getCount(),
+                safeGetTimer(metricRegistry, name(KeywordSearchResource.class, "searchKeyword")).getCount(),
+                safeGetTimer(metricRegistry, name(RelativeSearchResource.class, "searchRelative")).getCount(),
+                safeGetCounter(metricRegistry, name(GlobalTimeoutClient.class, "search-requests")).getCount()
+        );
+
         return NodeStats.create(
                 uptime,
                 inputService.totalCountForNode(nodeId.toString()),
@@ -286,6 +301,7 @@ public class NodeCollector {
                 journalStats,
                 searchTimings,
                 searchRanges,
+                searchStats,
                 sessionStats
         );
     }
