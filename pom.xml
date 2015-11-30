@@ -58,7 +58,7 @@
         <maven.compiler.source>1.7</maven.compiler.source>
         <maven.compiler.target>1.7</maven.compiler.target>
         <tagNameFormat>@{project.version}</tagNameFormat>
-        <graylog.version>1.3.0-SNAPSHOT</graylog.version>
+        <graylog.version>1.3.0-20151127.153927-347</graylog.version>
         <jackson.version>2.5.3</jackson.version>
         <license-maven-plugin.version>2.10</license-maven-plugin.version>
     </properties>
