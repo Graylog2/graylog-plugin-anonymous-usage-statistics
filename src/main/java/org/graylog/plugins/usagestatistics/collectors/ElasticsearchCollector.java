@@ -69,6 +69,9 @@ public class ElasticsearchCollector {
                 continue;
             }
 
+            // TODO remove these as soon as the backend service treats HostInfo as optional
+            // the host info details aren't available in Elasticsearch 2.x anymore, but we still report the empty
+            // bean because the backend service still expects some data (even if it is empty)
             final MacAddress macAddress = MacAddress.EMPTY;
             final HostInfo.Cpu cpu = null;
             final HostInfo.Memory memory = null;
