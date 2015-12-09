@@ -18,17 +18,14 @@ package org.graylog.plugins.usagestatistics.dto;
 import org.graylog2.plugin.ServerStatus;
 
 public enum NodeRole {
-    MASTER, SERVER, RADIO;
+    MASTER, SERVER;
 
     public static NodeRole fromCapabilities(ServerStatus serverStatus) {
         if (serverStatus.hasCapabilities(ServerStatus.Capability.MASTER)) {
             return NodeRole.MASTER;
         } else if (serverStatus.hasCapabilities(ServerStatus.Capability.SERVER)) {
             return NodeRole.SERVER;
-        } else if (serverStatus.hasCapabilities(ServerStatus.Capability.RADIO)) {
-            return NodeRole.RADIO;
         }
-
         throw new IllegalArgumentException("Unknown node role.");
     }
 }

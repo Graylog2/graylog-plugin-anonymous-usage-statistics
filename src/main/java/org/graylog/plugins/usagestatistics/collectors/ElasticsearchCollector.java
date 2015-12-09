@@ -69,25 +69,17 @@ public class ElasticsearchCollector {
                 continue;
             }
 
-            final MacAddress macAddress = info.getNetwork() == null ? MacAddress.EMPTY : MacAddress.create(info.getNetwork().primaryInterface().macAddress());
-            final HostInfo.Cpu cpu = info.getOs().cpu() == null ? null : HostInfo.Cpu.create(
-                    info.getOs().cpu().model(),
-                    info.getOs().cpu().vendor(),
-                    info.getOs().cpu().mhz(),
-                    info.getOs().cpu().totalCores(),
-                    info.getOs().cpu().totalSockets(),
-                    info.getOs().cpu().coresPerSocket(),
-                    info.getOs().cpu().cacheSize().bytes()
-            );
-            final HostInfo.Memory memory = info.getOs().mem() == null ? null : HostInfo.Memory.create(info.getOs().mem().total().bytes());
-            final HostInfo.Memory swap = info.getOs().swap() == null ? null : HostInfo.Memory.create(info.getOs().swap().total().bytes());
+            final MacAddress macAddress = MacAddress.EMPTY;
+            final HostInfo.Cpu cpu = null;
+            final HostInfo.Memory memory = null;
+            final HostInfo.Memory swap =  null;
             final HostInfo hostInfo = HostInfo.create(macAddress, cpu, memory, swap);
 
             final List<String> garbageCollectors;
             if (stats.getJvm() != null) {
                 garbageCollectors = Lists.newArrayList();
-                for (JvmStats.GarbageCollector gc : stats.getJvm().gc()) {
-                    garbageCollectors.add(gc.name());
+                for (JvmStats.GarbageCollector gc : stats.getJvm().getGc()) {
+                    garbageCollectors.add(gc.getName());
                 }
             } else {
                 garbageCollectors = Collections.emptyList();
@@ -96,11 +88,11 @@ public class ElasticsearchCollector {
             final JvmInfo jvmInfo;
             if (info.getJvm() != null) {
                 final JvmInfo.Memory jvmMemory = JvmInfo.Memory.create(
-                        info.getJvm().mem().heapInit().bytes(),
-                        info.getJvm().mem().heapMax().bytes(),
-                        info.getJvm().mem().nonHeapInit().bytes(),
-                        info.getJvm().mem().nonHeapMax().bytes(),
-                        info.getJvm().mem().directMemoryMax().bytes()
+                        info.getJvm().getMem().getHeapInit().bytes(),
+                        info.getJvm().getMem().getHeapMax().bytes(),
+                        info.getJvm().getMem().getNonHeapInit().bytes(),
+                        info.getJvm().getMem().getNonHeapMax().bytes(),
+                        info.getJvm().getMem().getDirectMemoryMax().bytes()
                 );
                 final JvmInfo.Os jvmOs = JvmInfo.Os.create(
                         info.getJvm().getSystemProperties().get("os.name"),
@@ -109,9 +101,9 @@ public class ElasticsearchCollector {
                 );
                 jvmInfo = JvmInfo.create(
                         info.getJvm().version(),
-                        info.getJvm().vmName(),
-                        info.getJvm().vmVersion(),
-                        info.getJvm().vmVendor(),
+                        info.getJvm().getVmName(),
+                        info.getJvm().getVmVersion(),
+                        info.getJvm().getVmVendor(),
                         jvmOs,
                         jvmMemory,
                         garbageCollectors
