@@ -19,11 +19,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.util.concurrent.MoreExecutors;
-import com.squareup.okhttp.Dispatcher;
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.mockwebserver.MockResponse;
-import com.squareup.okhttp.mockwebserver.MockWebServer;
-import com.squareup.okhttp.mockwebserver.RecordedRequest;
+import okhttp3.Dispatcher;
+import okhttp3.OkHttpClient;
+import okhttp3.mockwebserver.MockResponse;
+import okhttp3.mockwebserver.MockWebServer;
+import okhttp3.mockwebserver.RecordedRequest;
 import org.graylog.plugins.usagestatistics.providers.SmileObjectMapperProvider;
 import org.graylog2.plugin.cluster.ClusterId;
 import org.graylog2.shared.bindings.providers.OkHttpClientProvider;
@@ -60,10 +60,10 @@ public class UsageStatsOptOutServiceTest {
 
     @Before
     public void setUp() throws Exception {
-        final OkHttpClient httpClient = clientProvider.get();
-
         // Use a direct executor for the Dispatcher to avoid async calls during tests.
-        httpClient.setDispatcher(new Dispatcher(MoreExecutors.newDirectExecutorService()));
+        final OkHttpClient httpClient = clientProvider.get().newBuilder()
+                .dispatcher(new Dispatcher(MoreExecutors.newDirectExecutorService()))
+                .build();
 
         webserver.start();
 

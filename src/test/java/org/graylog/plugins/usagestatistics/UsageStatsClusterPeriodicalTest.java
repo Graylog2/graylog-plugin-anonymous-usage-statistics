@@ -16,15 +16,20 @@
 package org.graylog.plugins.usagestatistics;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.squareup.okhttp.OkHttpClient;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.mockwebserver.MockWebServer;
 import org.graylog.plugins.usagestatistics.providers.SmileObjectMapperProvider;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.cluster.ClusterId;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import java.io.IOException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.spy;
@@ -32,12 +37,12 @@ import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class UsageStatsClusterPeriodicalTest {
+    private final MockWebServer mockWebServer = new MockWebServer();
     @Mock
     private UsageStatsClusterService clusterService;
     @Mock
     private ServerStatus serverStatus;
     private UsageStatsConfiguration configuration;
-    @Mock
     private OkHttpClient httpClient;
 
     private TestClusterConfigService clusterConfigService;
@@ -46,10 +51,18 @@ public class UsageStatsClusterPeriodicalTest {
 
     @Before
     public void setUp() throws Exception {
+        mockWebServer.start();
         configuration = spy(new UsageStatsConfiguration());
 
         clusterConfigService = new TestClusterConfigService();
         objectMapper = new SmileObjectMapperProvider().get();
+        httpClient = new OkHttpClient.Builder()
+                .addInterceptor(chain -> {
+                    final Request request = chain.request().newBuilder()
+                            .url(mockWebServer.url("/cluster/test-cluster-id"))
+                            .build();
+                    return chain.proceed(request);
+                }).build();
         periodical = new UsageStatsClusterPeriodical(
                 clusterService,
                 serverStatus,
@@ -60,6 +73,11 @@ public class UsageStatsClusterPeriodicalTest {
         );
 
         clusterConfigService.write(ClusterId.create("test-cluster-id"));
+    }
+
+    @After
+    public void tearDown() throws IOException {
+        mockWebServer.shutdown();
     }
 
     @Test

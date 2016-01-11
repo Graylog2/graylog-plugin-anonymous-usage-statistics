@@ -16,7 +16,7 @@
 package org.graylog.plugins.usagestatistics;
 
 import com.google.auto.value.AutoValue;
-import com.squareup.okhttp.Headers;
+import okhttp3.Headers;
 
 @AutoValue
 public abstract class UsageStatsRequest {

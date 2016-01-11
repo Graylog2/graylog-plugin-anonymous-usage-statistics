@@ -16,7 +16,7 @@
 package org.graylog.plugins.usagestatistics;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.squareup.okhttp.OkHttpClient;
+import okhttp3.OkHttpClient;
 import org.graylog.plugins.usagestatistics.collectors.ClusterCollector;
 import org.graylog.plugins.usagestatistics.collectors.CollectorCollector;
 import org.graylog.plugins.usagestatistics.collectors.ElasticsearchCollector;

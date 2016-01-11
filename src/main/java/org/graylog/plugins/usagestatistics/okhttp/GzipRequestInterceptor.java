@@ -16,11 +16,11 @@
 package org.graylog.plugins.usagestatistics.okhttp;
 
 import com.google.common.net.HttpHeaders;
-import com.squareup.okhttp.Interceptor;
-import com.squareup.okhttp.MediaType;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.RequestBody;
-import com.squareup.okhttp.Response;
+import okhttp3.Interceptor;
+import okhttp3.MediaType;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 import okio.BufferedSink;
 import okio.GzipSink;
 import okio.Okio;
@@ -28,7 +28,7 @@ import okio.Okio;
 import java.io.IOException;
 
 /**
- * This {@link com.squareup.okhttp.Interceptor} compresses the HTTP request body with gzip.
+ * This {@link okhttp3.Interceptor} compresses the HTTP request body with gzip.
  * <p>
  * Many web servers can't handle this but we know that the statistics collector is able to do this.
  * </p>

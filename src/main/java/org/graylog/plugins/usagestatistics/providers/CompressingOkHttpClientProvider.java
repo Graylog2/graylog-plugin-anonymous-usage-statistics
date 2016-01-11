@@ -15,7 +15,7 @@
  */
 package org.graylog.plugins.usagestatistics.providers;
 
-import com.squareup.okhttp.OkHttpClient;
+import okhttp3.OkHttpClient;
 import org.graylog.plugins.usagestatistics.okhttp.GzipRequestInterceptor;
 import org.graylog2.shared.bindings.providers.OkHttpClientProvider;
 
@@ -29,11 +29,13 @@ public class CompressingOkHttpClientProvider implements Provider<OkHttpClient> {
     @Inject
     public CompressingOkHttpClientProvider(OkHttpClientProvider okHttpClientProvider,
                                            @Named("usage_statistics_gzip_enabled") boolean gzipEnabled) {
-        client = okHttpClientProvider.get().clone();
+        final OkHttpClient.Builder clientBuilder = okHttpClientProvider.get().newBuilder();
 
         if (gzipEnabled) {
-            client.interceptors().add(new GzipRequestInterceptor());
+            clientBuilder.addInterceptor(new GzipRequestInterceptor());
         }
+
+        client = clientBuilder.build();
     }
 
     @Override

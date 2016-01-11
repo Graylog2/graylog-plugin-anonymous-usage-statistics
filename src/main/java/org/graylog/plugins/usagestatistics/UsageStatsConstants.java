@@ -15,7 +15,7 @@
  */
 package org.graylog.plugins.usagestatistics;
 
-import com.squareup.okhttp.MediaType;
+import okhttp3.MediaType;
 import org.graylog2.plugin.Version;
 
 public class UsageStatsConstants {

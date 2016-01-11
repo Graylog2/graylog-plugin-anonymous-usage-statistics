@@ -16,8 +16,8 @@
 package org.graylog.plugins.usagestatistics.providers;
 
 import com.github.joschi.jadconfig.util.Duration;
-import com.squareup.okhttp.Interceptor;
-import com.squareup.okhttp.OkHttpClient;
+import okhttp3.Interceptor;
+import okhttp3.OkHttpClient;
 import org.graylog.plugins.usagestatistics.okhttp.GzipRequestInterceptor;
 import org.graylog2.shared.bindings.providers.OkHttpClientProvider;
 import org.junit.Test;
