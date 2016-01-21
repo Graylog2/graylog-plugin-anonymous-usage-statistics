@@ -39,7 +39,7 @@ import static org.graylog2.shared.security.RestPermissions.CLUSTER_CONFIG_ENTRY_
 import static org.graylog2.shared.security.RestPermissions.CLUSTER_CONFIG_ENTRY_READ;
 
 @RequiresAuthentication
-@Api(value = "Usage Statistics Opt-Out", description = "Anonymous usage statistics opt-out state of this Graylog setup")
+@Api(value = "UsageStatistics/Opt-Out", description = "Anonymous usage statistics opt-out state of this Graylog setup")
 @Path("/opt-out")
 public class UsageStatsOptOutResource extends RestResource implements PluginRestResource {
     private static final String CLUSTER_CONFIG_INSTANCE = UsageStatsOptOutState.class.getCanonicalName();

@@ -33,7 +33,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 @RequiresAuthentication
-@Api(value = "Usage Statistics", description = "Anonymous usage statistics of this Graylog setup")
+@Api(value = "UsageStatistics", description = "Anonymous usage statistics of this Graylog setup")
 @Path("/")
 public class UsageStatsResource extends RestResource implements PluginRestResource {
     private final UsageStatsNodeService usageStatsNodeService;
