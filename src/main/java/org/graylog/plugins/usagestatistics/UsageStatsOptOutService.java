@@ -18,6 +18,7 @@ package org.graylog.plugins.usagestatistics;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
+import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Headers;
 import okhttp3.HttpUrl;
@@ -102,13 +103,13 @@ public class UsageStatsOptOutService {
         // Run the opt-out request outside of the calling thread so it does not block.
         httpClient.newCall(request).enqueue(new Callback() {
             @Override
-            public void onFailure(Request request, IOException e) {
+            public void onFailure(Call call, IOException e) {
                 LOG.error("Error while sending anonymous usage statistics opt-out");
                 LOG.debug("Error details", e);
             }
 
             @Override
-            public void onResponse(Response response) throws IOException {
+            public void onResponse(Call call, Response response) throws IOException {
                 if (!response.isSuccessful()) {
                     LOG.warn("Couldn't successfully send usage statistics opt-out: {}", response);
                 }
