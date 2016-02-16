@@ -20,6 +20,8 @@ import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.shared.utilities.AutoValueUtils;
 
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 
@@ -43,6 +45,21 @@ public class TestClusterConfigService implements ClusterConfigService {
 
     public <T> int remove(Class<T> type) {
         return data.remove(type.getCanonicalName()) == null ? 0 : 1;
+    }
+
+    @Override
+    public Set<Class<?>> list() {
+        return data.keySet()
+                .stream()
+                .map(className -> {
+                    try {
+                        return Class.forName(className);
+                    } catch (ClassNotFoundException ignore) {
+                        return null;
+                    }
+                })
+                .filter(aClass -> aClass != null)
+                .collect(Collectors.toSet());
     }
 
     public void clear() {
