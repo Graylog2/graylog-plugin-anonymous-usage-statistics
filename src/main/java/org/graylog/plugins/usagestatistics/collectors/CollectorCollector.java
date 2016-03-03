@@ -15,30 +15,15 @@
  */
 package org.graylog.plugins.usagestatistics.collectors;
 
-import com.google.common.collect.ImmutableSet;
 import org.graylog.plugins.usagestatistics.dto.CollectorInfo;
-import org.graylog2.collectors.Collector;
-import org.graylog2.collectors.CollectorService;
 
-import javax.inject.Inject;
+import java.util.Collections;
 import java.util.Set;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
+// This is just a dummy because the collector classes have been removed from Graylog core.
+// If this gets removed, the usage-stats collector needs an update!
 public class CollectorCollector {
-    private final CollectorService collectorService;
-
-    @Inject
-    public CollectorCollector(CollectorService collectorService) {
-        this.collectorService = checkNotNull(collectorService);
-    }
-
     public Set<CollectorInfo> getCollectorInfos() {
-        final ImmutableSet.Builder<CollectorInfo> collectorInfos = ImmutableSet.builder();
-        for (Collector collector : collectorService.all()) {
-            collectorInfos.add(CollectorInfo.create(collector.getCollectorVersion(), collector.getNodeDetails().operatingSystem()));
-        }
-
-        return collectorInfos.build();
+        return Collections.emptySet();
     }
 }
