@@ -17,7 +17,6 @@ package org.graylog.plugins.usagestatistics.collectors;
 
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.collect.ImmutableMap;
-import org.cliffc.high_scale_lib.Counter;
 import org.graylog.plugins.usagestatistics.UsageStatsMetaData;
 import org.graylog.plugins.usagestatistics.dto.AlarmStats;
 import org.graylog.plugins.usagestatistics.dto.ClusterDataSet;
@@ -27,11 +26,11 @@ import org.graylog2.indexer.counts.Counts;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.cluster.ClusterId;
 import org.graylog2.plugin.inputs.Extractor;
-import org.graylog2.shared.stats.ThroughputStats;
 import org.graylog2.system.stats.ClusterStatsService;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import java.util.Collections;
 import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -42,7 +41,6 @@ public class ClusterCollector {
     private final MongoCollector mongoCollector;
     private final CollectorCollector collectorCollector;
     private final Counts counts;
-    private final ThroughputStats throughputStats;
     private final ClusterConfigService clusterConfigService;
     private final long reportIntervalMs;
 
@@ -52,7 +50,6 @@ public class ClusterCollector {
                             MongoCollector mongoCollector,
                             CollectorCollector collectorCollector,
                             Counts counts,
-                            ThroughputStats throughputStats,
                             @Named("usage_statistics_report_interval") Duration reportInterval,
                             ClusterConfigService clusterConfigService) {
         this.clusterStatsService = checkNotNull(clusterStatsService);
@@ -60,7 +57,6 @@ public class ClusterCollector {
         this.mongoCollector = checkNotNull(mongoCollector);
         this.collectorCollector = checkNotNull(collectorCollector);
         this.counts = checkNotNull(counts);
-        this.throughputStats = checkNotNull(throughputStats);
         this.reportIntervalMs = checkNotNull(reportInterval).toMilliseconds();
         this.clusterConfigService = checkNotNull(clusterConfigService);
     }
@@ -106,11 +102,7 @@ public class ClusterCollector {
     }
 
     private Map<String, Long> buildStreamThroughput() {
-        final ImmutableMap.Builder<String, Long> builder = ImmutableMap.builder();
-        for (Map.Entry<String, Counter> entry : throughputStats.getCurrentStreamThroughput().entrySet()) {
-            builder.put(entry.getKey(), entry.getValue().get());
-        }
-        return builder.build();
+        return Collections.emptyMap();
     }
 
     private Map<String, Long> buildExtractorCountByType() {
