@@ -59,7 +59,7 @@
         <maven.compiler.target>1.8</maven.compiler.target>
         <tagNameFormat>@{project.version}</tagNameFormat>
         <graylog.version>2.1.0-SNAPSHOT</graylog.version>
-        <jackson.version>2.6.2</jackson.version>
+        <jackson.version>2.7.4</jackson.version>
         <okhttp.version>3.2.0</okhttp.version>
         <license-maven-plugin.version>2.10</license-maven-plugin.version>
     </properties>
