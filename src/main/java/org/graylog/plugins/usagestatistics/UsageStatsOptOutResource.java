@@ -21,6 +21,8 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog.plugins.usagestatistics.audit.UsageStatsAuditEventTypes;
+import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.shared.rest.resources.RestResource;
 
@@ -80,6 +82,7 @@ public class UsageStatsOptOutResource extends RestResource implements PluginRest
             @ApiResponse(code = 400, message = "Missing or invalid opt-out state"),
             @ApiResponse(code = 500, message = "Internal Server Error")
     })
+    @AuditEvent(type = UsageStatsAuditEventTypes.OPT_OUT_UPDATE)
     public void setOptOutState(@Valid @NotNull UsageStatsOptOutState optOutState) {
         checkPermission(CLUSTER_CONFIG_ENTRY_CREATE, CLUSTER_CONFIG_INSTANCE);
 

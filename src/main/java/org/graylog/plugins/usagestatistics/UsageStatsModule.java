@@ -17,6 +17,7 @@ package org.graylog.plugins.usagestatistics;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import okhttp3.OkHttpClient;
+import org.graylog.plugins.usagestatistics.audit.UsageStatsAuditEventTypes;
 import org.graylog.plugins.usagestatistics.collectors.ClusterCollector;
 import org.graylog.plugins.usagestatistics.collectors.CollectorCollector;
 import org.graylog.plugins.usagestatistics.collectors.ElasticsearchCollector;
@@ -58,5 +59,7 @@ public class UsageStatsModule extends PluginModule {
         addRestResource(UsageStatsOptOutResource.class);
 
         addConfigBeans();
+
+        addAuditEventTypes(UsageStatsAuditEventTypes.class);
     }
 }
