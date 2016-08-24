@@ -10,3 +10,7 @@ out/
 *.iml
 *.iws
 *.ipr
+
+# NPM modules
+node_modules/
+
