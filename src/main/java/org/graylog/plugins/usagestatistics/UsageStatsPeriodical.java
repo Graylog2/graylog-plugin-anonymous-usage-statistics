@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *         http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -159,17 +159,14 @@ public abstract class UsageStatsPeriodical extends Periodical {
                 .post(RequestBody.create(CONTENT_TYPE, usageStatsRequest.body()))
                 .build();
 
-        final Response response;
-        try {
-            response = httpClient.newCall(request).execute();
+        try (final Response response = httpClient.newCall(request).execute()) {
+            if (!response.isSuccessful()) {
+                log.warn("Couldn't successfully upload anonymous usage statistics: {}", response);
+                return false;
+            }
         } catch (IOException e) {
             log.error("Error while uploading anonymous usage statistics");
             log.debug("Error details", e);
-            return false;
-        }
-
-        if (!response.isSuccessful()) {
-            log.warn("Couldn't successfully upload anonymous usage statistics: {}", response);
             return false;
         }
 
