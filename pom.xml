@@ -60,7 +60,7 @@
         <tagNameFormat>@{project.version}</tagNameFormat>
         <graylog.version>2.2.0-SNAPSHOT</graylog.version>
         <jackson.version>2.7.4</jackson.version>
-        <okhttp.version>3.2.0</okhttp.version>
+        <okhttp.version>3.4.1</okhttp.version>
         <license-maven-plugin.version>2.10</license-maven-plugin.version>
     </properties>
 
