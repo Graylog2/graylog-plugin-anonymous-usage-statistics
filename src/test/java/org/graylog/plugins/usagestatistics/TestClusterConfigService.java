@@ -28,9 +28,16 @@ import static com.google.common.base.MoreObjects.firstNonNull;
 public class TestClusterConfigService implements ClusterConfigService {
     private final Map<String, Object> data = Maps.newConcurrentMap();
 
+    @Override
     @SuppressWarnings("unchecked")
     public <T> T get(Class<T> type) {
         return (T) data.get(type.getCanonicalName());
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T> T get(String key, Class<T> type) {
+        return (T) data.get(key);
     }
 
     @Override
