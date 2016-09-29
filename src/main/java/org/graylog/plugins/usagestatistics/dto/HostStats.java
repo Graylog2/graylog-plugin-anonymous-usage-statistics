@@ -29,6 +29,7 @@ public abstract class HostStats {
     }
 
     @JsonProperty
+    @SuppressWarnings("mutable")
     public abstract double[] loadAvg();
 
     @JsonProperty

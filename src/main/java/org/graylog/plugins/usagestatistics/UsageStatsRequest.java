@@ -26,5 +26,6 @@ public abstract class UsageStatsRequest {
 
     public abstract Headers headers();
 
+    @SuppressWarnings("mutable")
     public abstract byte[] body();
 }

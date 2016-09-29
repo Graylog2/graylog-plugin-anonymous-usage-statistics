@@ -107,7 +107,6 @@ public class UsageStatsNodePeriodicalTest {
         assertThat(periodical.startOnThisNode()).isFalse();
 
         when(configuration.isEnabled()).thenReturn(false);
-        when(serverStatus.hasCapability(ServerStatus.Capability.LOCALMODE)).thenReturn(true);
         assertThat(periodical.startOnThisNode()).isFalse();
     }
 

@@ -50,6 +50,7 @@ public class TestClusterConfigService implements ClusterConfigService {
         data.put(AutoValueUtils.getCanonicalName(payload.getClass()), payload);
     }
 
+    @Override
     public <T> int remove(Class<T> type) {
         return data.remove(type.getCanonicalName()) == null ? 0 : 1;
     }

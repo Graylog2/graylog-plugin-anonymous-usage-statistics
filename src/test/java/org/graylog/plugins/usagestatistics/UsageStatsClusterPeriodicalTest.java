@@ -109,13 +109,9 @@ public class UsageStatsClusterPeriodicalTest {
         assertThat(periodical.startOnThisNode()).isFalse();
 
         when(configuration.isEnabled()).thenReturn(false);
-        when(serverStatus.hasCapability(ServerStatus.Capability.MASTER)).thenReturn(false);
-        when(serverStatus.hasCapability(ServerStatus.Capability.LOCALMODE)).thenReturn(true);
         assertThat(periodical.startOnThisNode()).isFalse();
 
         when(configuration.isEnabled()).thenReturn(false);
-        when(serverStatus.hasCapability(ServerStatus.Capability.MASTER)).thenReturn(false);
-        when(serverStatus.hasCapability(ServerStatus.Capability.LOCALMODE)).thenReturn(false);
         assertThat(periodical.startOnThisNode()).isFalse();
     }
 

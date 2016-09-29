@@ -15,10 +15,10 @@
  */
 package org.graylog.plugins.usagestatistics;
 
-import autovalue.shaded.com.google.common.common.collect.ImmutableMap;
 import com.github.joschi.jadconfig.JadConfig;
 import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.repositories.InMemoryRepository;
+import com.google.common.collect.ImmutableMap;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;

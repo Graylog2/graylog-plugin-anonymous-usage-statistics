@@ -68,6 +68,7 @@ public class UsageStatsClusterPeriodical extends UsageStatsPeriodical {
         this.usageStatsClusterService = usageStatsClusterService;
     }
 
+    @Override
     protected URL getUrl() {
         final ClusterId clusterId = clusterConfigService.get(ClusterId.class);
         if (clusterId != null) {

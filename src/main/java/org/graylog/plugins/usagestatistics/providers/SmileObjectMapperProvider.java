@@ -33,7 +33,7 @@ public class SmileObjectMapperProvider implements Provider<ObjectMapper> {
                 .enable(SmileGenerator.Feature.WRITE_END_MARKER);
 
         objectMapper = new ObjectMapper(smileFactory)
-                .setPropertyNamingStrategy(PropertyNamingStrategy.CAMEL_CASE_TO_LOWER_CASE_WITH_UNDERSCORES)
+                .setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE)
                 .registerModule(new JodaModule())
                 .registerModule(new GuavaModule());
     }
