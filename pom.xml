@@ -8,7 +8,7 @@
     <parent>
         <groupId>org.graylog.plugins</groupId>
         <artifactId>graylog-plugin-parent</artifactId>
-        <version>2.2.0-alpha.1</version>
+        <version>2.2.0-alpha.2-SNAPSHOT</version>
         <relativePath>../graylog2-server/graylog-plugin-parent</relativePath>
     </parent>
 
@@ -52,7 +52,7 @@
     </scm>
 
     <properties>
-        <graylog.version>2.2.0-alpha.1</graylog.version>
+        <graylog.version>2.2.0-alpha.2-SNAPSHOT</graylog.version>
     </properties>
 
     <distributionManagement>
