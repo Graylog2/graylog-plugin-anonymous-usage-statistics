@@ -24,7 +24,8 @@ import java.util.EnumSet;
 import java.util.Set;
 
 public class UsageStatsMetaData implements PluginMetaData {
-    public static final Version VERSION = Version.from(2, 2, 0, "alpha.1");
+    private static final String PLUGIN_PROPERTIES = "org.graylog.plugins.usage-statistics/graylog-plugin.properties";
+    public static final Version VERSION = Version.fromPluginProperties(UsageStatsMetaData.class, PLUGIN_PROPERTIES, "graylog.version", Version.CURRENT_CLASSPATH);
 
     @Override
     public String getUniqueId() {
@@ -54,7 +55,7 @@ public class UsageStatsMetaData implements PluginMetaData {
 
     @Override
     public Version getVersion() {
-        return VERSION;
+        return Version.fromPluginProperties(this.getClass(), PLUGIN_PROPERTIES, "version", Version.from(0, 0, 0, "unknown"));
     }
 
     @Override
@@ -64,6 +65,6 @@ public class UsageStatsMetaData implements PluginMetaData {
 
     @Override
     public Version getRequiredVersion() {
-        return Version.from(2, 2, 0);
+        return Version.fromPluginProperties(this.getClass(), PLUGIN_PROPERTIES, "graylog.version", Version.CURRENT_CLASSPATH);
     }
 }
