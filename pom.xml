@@ -13,7 +13,7 @@
     </parent>
 
     <groupId>org.graylog.plugins</groupId>
-    <artifactId>usage-statistics</artifactId>
+    <artifactId>graylog-plugin-anonymous-usage-statistics</artifactId>
     <version>2.2.0-alpha.5-SNAPSHOT</version>
     <packaging>jar</packaging>
 
