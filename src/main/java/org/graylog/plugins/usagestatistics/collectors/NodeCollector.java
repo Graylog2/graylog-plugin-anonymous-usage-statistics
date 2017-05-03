@@ -40,7 +40,7 @@ import org.graylog.plugins.usagestatistics.dto.SearchStats;
 import org.graylog.plugins.usagestatistics.dto.SessionStats;
 import org.graylog.plugins.usagestatistics.dto.ThroughputStats;
 import org.graylog.plugins.usagestatistics.util.MetricUtils;
-import org.graylog2.indexer.elasticsearch.GlobalTimeoutClient;
+import org.graylog2.indexer.searches.Searches;
 import org.graylog2.inputs.Input;
 import org.graylog2.inputs.InputService;
 import org.graylog2.plugin.PluginMetaData;
@@ -291,7 +291,7 @@ public class NodeCollector {
                 safeGetTimer(metricRegistry, name(AbsoluteSearchResource.class, "searchAbsolute")).getCount(),
                 safeGetTimer(metricRegistry, name(KeywordSearchResource.class, "searchKeyword")).getCount(),
                 safeGetTimer(metricRegistry, name(RelativeSearchResource.class, "searchRelative")).getCount(),
-                safeGetCounter(metricRegistry, name(GlobalTimeoutClient.class, "search-requests")).getCount()
+                safeGetCounter(metricRegistry, name(Searches.class, "elasticsearch", "searches")).getCount()
         );
 
         return NodeStats.create(
