@@ -291,7 +291,7 @@ public class NodeCollector {
                 safeGetTimer(metricRegistry, name(AbsoluteSearchResource.class, "searchAbsolute")).getCount(),
                 safeGetTimer(metricRegistry, name(KeywordSearchResource.class, "searchKeyword")).getCount(),
                 safeGetTimer(metricRegistry, name(RelativeSearchResource.class, "searchRelative")).getCount(),
-                safeGetCounter(metricRegistry, name(Searches.class, "elasticsearch", "searches")).getCount()
+                safeGetCounter(metricRegistry, name(Searches.class, "elasticsearch", "total-searches")).getCount()
         );
 
         return NodeStats.create(
