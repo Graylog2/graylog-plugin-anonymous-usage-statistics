@@ -30,6 +30,7 @@ import org.graylog.plugins.usagestatistics.dto.elasticsearch.ElasticsearchCluste
 import org.graylog.plugins.usagestatistics.dto.elasticsearch.ElasticsearchNodeInfo;
 import org.graylog.plugins.usagestatistics.dto.elasticsearch.IndicesStats;
 import org.graylog.plugins.usagestatistics.dto.elasticsearch.NodesStats;
+import org.graylog2.indexer.cluster.jest.JestUtils;
 import org.graylog2.indexer.gson.GsonUtils;
 import org.graylog2.system.stats.ClusterStatsService;
 import org.graylog2.system.stats.elasticsearch.ElasticsearchStats;
@@ -147,6 +148,7 @@ public class ElasticsearchCollector {
     }
 
     private JsonObject fetchNodeInfos() {
+        final String errorMessage = "Unable to fetch node infos.";
         final NodesInfo.Builder requestBuilder = new NodesInfo.Builder()
                 .withHttp()
                 .withJvm()
@@ -157,13 +159,9 @@ public class ElasticsearchCollector {
                 .withSettings()
                 .withThreadPool()
                 .withTransport();
-        try {
-            final JestResult result = jestClient.execute(requestBuilder.build());
-            return Optional.of(result.getJsonObject())
-                    .map(json -> GsonUtils.asJsonObject(json.get("nodes")))
-                    .orElse(null);
-        } catch (IOException e) {
-            return null;
-        }
+        final JestResult result = JestUtils.execute(jestClient, requestBuilder.build(), () -> errorMessage);
+        return Optional.of(result.getJsonObject())
+                .map(json -> GsonUtils.asJsonObject(json.get("nodes")))
+                .orElseThrow(() -> new IllegalStateException(errorMessage + " Unable to parse reply: " + result.getJsonString()));
     }
 }
