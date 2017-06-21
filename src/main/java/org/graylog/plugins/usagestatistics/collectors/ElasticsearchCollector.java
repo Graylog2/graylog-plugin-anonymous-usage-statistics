@@ -16,9 +16,8 @@
  */
 package org.graylog.plugins.usagestatistics.collectors;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Sets;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import io.searchbox.client.JestClient;
 import io.searchbox.client.JestResult;
 import io.searchbox.cluster.NodesInfo;
@@ -31,25 +30,18 @@ import org.graylog.plugins.usagestatistics.dto.elasticsearch.ElasticsearchNodeIn
 import org.graylog.plugins.usagestatistics.dto.elasticsearch.IndicesStats;
 import org.graylog.plugins.usagestatistics.dto.elasticsearch.NodesStats;
 import org.graylog2.indexer.cluster.jest.JestUtils;
-import org.graylog2.indexer.gson.GsonUtils;
 import org.graylog2.system.stats.ClusterStatsService;
 import org.graylog2.system.stats.elasticsearch.ElasticsearchStats;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 public class ElasticsearchCollector {
-    private static final Logger LOG = LoggerFactory.getLogger(ElasticsearchCollector.class);
-
     private final ClusterStatsService clusterStatsService;
     private final JestClient jestClient;
 
@@ -60,80 +52,66 @@ public class ElasticsearchCollector {
     }
 
     public Set<ElasticsearchNodeInfo> getNodeInfos() {
-        final JsonObject nodesMap = fetchNodeInfos();
-        if (nodesMap == null) {
+        final JsonNode nodesMap = fetchNodeInfos();
+        if (nodesMap.isMissingNode()) {
             return Collections.emptySet();
         }
-        final Set<ElasticsearchNodeInfo> elasticsearchNodeInfos = Sets.newHashSetWithExpectedSize(nodesMap.entrySet().size());
-        Optional.of(nodesMap)
-                .map(JsonObject::entrySet)
-                .map(Iterable::spliterator)
-                .map(splitr -> StreamSupport.stream(splitr, false))
-                .orElse(Stream.empty())
-                .forEach(entry -> {
+        final Set<ElasticsearchNodeInfo> elasticsearchNodeInfos = Sets.newHashSet();
+        final Iterator<Map.Entry<String, JsonNode>> fields = nodesMap.fields();
+        while (fields.hasNext()) {
+            final Map.Entry<String, JsonNode> entry = fields.next();
+            // TODO remove these as soon as the backend service treats HostInfo as optional
+            // the host info details aren't available in Elasticsearch 2.x anymore, but we still report the empty
+            // bean because the backend service still expects some data (even if it is empty)
+            final MacAddress macAddress = MacAddress.EMPTY;
+            final HostInfo.Cpu cpu = null;
+            final HostInfo.Memory memory = null;
+            final HostInfo.Memory swap = null;
+            final HostInfo hostInfo = HostInfo.create(macAddress, cpu, memory, swap);
 
-                    // TODO remove these as soon as the backend service treats HostInfo as optional
-                    // the host info details aren't available in Elasticsearch 2.x anymore, but we still report the empty
-                    // bean because the backend service still expects some data (even if it is empty)
-                    final MacAddress macAddress = MacAddress.EMPTY;
-                    final HostInfo.Cpu cpu = null;
-                    final HostInfo.Memory memory = null;
-                    final HostInfo.Memory swap = null;
-                    final HostInfo hostInfo = HostInfo.create(macAddress, cpu, memory, swap);
+            final JsonNode jvm = entry.getValue().path("jvm");
+            final List<String> garbageCollectors = new ArrayList<>();
+            for(JsonNode jsonNode :jvm.path("gc_collectors")) {
+                if(jsonNode.isTextual()) {
+                    garbageCollectors.add(jsonNode.asText());
+                }
+            }
+            final JsonNode memInfo = jvm.path("mem");
 
-                    final Optional<JsonObject> jvm = Optional.of(entry.getValue())
-                            .map(JsonElement::getAsJsonObject)
-                            .map(nodeInfo -> GsonUtils.asJsonObject(nodeInfo.get("jvm")));
+            final JvmInfo.Memory jvmMemory = JvmInfo.Memory.create(
+                    memInfo.path("heap_init_in_bytes").asLong(-1L),
+                    memInfo.path("heap_max_in_bytes").asLong(-1L),
+                    memInfo.path("non_heap_init_in_bytes").asLong(-1L),
+                    memInfo.path("non_heap_max_in_bytes").asLong(-1L),
+                    memInfo.path("direct_max_in_bytes").asLong(-1L)
+            );
 
-                    final List<String> garbageCollectors = jvm
-                            .map(jvmInfo -> GsonUtils.asJsonArray(jvmInfo.get("gc_collectors")))
-                            .map(Iterable::spliterator)
-                            .map(splitr -> StreamSupport.stream(splitr, false))
-                            .orElse(Stream.empty())
-                            .map(String::valueOf)
-                            .collect(Collectors.toList());
+            final JsonNode osInfo = entry.getValue().path("os");
 
-                    final Optional<JsonObject> memInfo = jvm.map(jvmInfo -> GsonUtils.asJsonObject(jvmInfo.get("mem")));
+            final JvmInfo.Os jvmOs = JvmInfo.Os.create(
+                    osInfo.path("name").asText("<unknown>"),
+                    osInfo.path("version").asText("<unknown>"),
+                    osInfo.path("arch").asText("<unknown>")
+            );
+            final JvmInfo jvmInfo = JvmInfo.create(
+                    jvm.path("version").asText("<unknown>"),
+                    jvm.path("vm_name").asText("<unknown>"),
+                    jvm.path("vm_version").asText("<unknown>"),
+                    jvm.path("vm_vendor").asText("<unknown>"),
+                    jvmOs,
+                    jvmMemory,
+                    garbageCollectors
+            );
+            final String esVersion = entry.getValue().path("version").asText("<unknown>");
 
-                    final JvmInfo.Memory jvmMemory = JvmInfo.Memory.create(
-                            memInfo.map(mem -> GsonUtils.asLong(mem.get("heap_init_in_bytes"))).orElse(-1L),
-                            memInfo.map(mem -> GsonUtils.asLong(mem.get("heap_max_in_bytes"))).orElse(-1L),
-                            memInfo.map(mem -> GsonUtils.asLong(mem.get("non_heap_init_in_bytes"))).orElse(-1L),
-                            memInfo.map(mem -> GsonUtils.asLong(mem.get("non_heap_max_in_bytes"))).orElse(-1L),
-                            memInfo.map(mem -> GsonUtils.asLong(mem.get("direct_max_in_bytes"))).orElse(-1L)
-                    );
+            final ElasticsearchNodeInfo elasticsearchNodeInfo = ElasticsearchNodeInfo.create(
+                    esVersion,
+                    hostInfo,
+                    jvmInfo
+            );
 
-                    final Optional<JsonObject> osInfo = Optional.of(entry.getValue())
-                            .map(JsonElement::getAsJsonObject)
-                            .map(nodeInfo -> GsonUtils.asJsonObject(nodeInfo.get("os")));
-
-                    final JvmInfo.Os jvmOs = JvmInfo.Os.create(
-                            osInfo.map(os -> GsonUtils.asString(os.get("name"))).orElse("<unknown>"),
-                            osInfo.map(os -> GsonUtils.asString(os.get("version"))).orElse("<unknown>"),
-                            osInfo.map(os -> GsonUtils.asString(os.get("arch"))).orElse("<unknown>")
-                    );
-                    final JvmInfo jvmInfo = JvmInfo.create(
-                            jvm.map(j -> GsonUtils.asString(j.get("version"))).orElse("<unknown>"),
-                            jvm.map(j -> GsonUtils.asString(j.get("vm_name"))).orElse("<unknown>"),
-                            jvm.map(j -> GsonUtils.asString(j.get("vm_version"))).orElse("<unknown>"),
-                            jvm.map(j -> GsonUtils.asString(j.get("vm_vendor"))).orElse("<unknown>"),
-                            jvmOs,
-                            jvmMemory,
-                            garbageCollectors
-                    );
-                    final String esVersion = Optional.of(entry.getValue())
-                            .map(JsonElement::getAsJsonObject)
-                            .map(nodeInfo -> GsonUtils.asString(nodeInfo.get("version")))
-                            .orElse("<unknown>");
-
-                    final ElasticsearchNodeInfo elasticsearchNodeInfo = ElasticsearchNodeInfo.create(
-                            esVersion,
-                            hostInfo,
-                            jvmInfo
-                    );
-
-                    elasticsearchNodeInfos.add(elasticsearchNodeInfo);
-                });
+            elasticsearchNodeInfos.add(elasticsearchNodeInfo);
+        }
 
         return elasticsearchNodeInfos;
     }
@@ -147,7 +125,7 @@ public class ElasticsearchCollector {
         );
     }
 
-    private JsonObject fetchNodeInfos() {
+    private JsonNode fetchNodeInfos() {
         final String errorMessage = "Unable to fetch node infos.";
         final NodesInfo.Builder requestBuilder = new NodesInfo.Builder()
                 .withHttp()
@@ -160,8 +138,11 @@ public class ElasticsearchCollector {
                 .withThreadPool()
                 .withTransport();
         final JestResult result = JestUtils.execute(jestClient, requestBuilder.build(), () -> errorMessage);
-        return Optional.of(result.getJsonObject())
-                .map(json -> GsonUtils.asJsonObject(json.get("nodes")))
-                .orElseThrow(() -> new IllegalStateException(errorMessage + " Unable to parse reply: " + result.getJsonString()));
+        final JsonNode nodeInfos = result.getJsonObject().path("nodes");
+        if (nodeInfos.isMissingNode()) {
+            throw new IllegalStateException(errorMessage + " Unable to parse reply: " + result.getJsonString());
+        }
+
+        return nodeInfos;
     }
 }
