@@ -1,3 +1,9 @@
+# DEPRECATION NOTICE
+
+As of Graylog 3.0.0, this plugin is deprecated and will not be developed any further.
+
+----
+
 # Graylog Anonymous Usage Statistics Plugin
 [![Build Status](https://travis-ci.org/Graylog2/graylog-plugin-anonymous-usage-statistics.svg?branch=master)](https://travis-ci.org/Graylog2/graylog-plugin-anonymous-usage-statistics)
 
