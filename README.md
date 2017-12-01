@@ -1,6 +1,6 @@
 # DEPRECATION NOTICE
 
-As of Graylog 3.0.0, this plugin is deprecated and will not be developed any further.
+As of Graylog 2.4.0/3.0.0, this plugin is deprecated and will not be developed any further.
 
 ----
 
